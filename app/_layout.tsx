@@ -4,6 +4,7 @@ import { useColorScheme } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { palette } from "@/constants/theme";
 import { ProgressProvider } from "@/contexts/ProgressContext";
+import { EntitlementProvider } from "@/contexts/EntitlementContext";
 
 export default function RootLayout() {
   const scheme = useColorScheme();
@@ -11,7 +12,8 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <ProgressProvider>
+      <EntitlementProvider>
+        <ProgressProvider>
       <StatusBar style={scheme === "dark" ? "light" : "dark"} />
       <Stack
         screenOptions={{
@@ -19,7 +21,8 @@ export default function RootLayout() {
           contentStyle: { backgroundColor: colors.background },
         }}
       />
-      </ProgressProvider>
+        </ProgressProvider>
+      </EntitlementProvider>
     </SafeAreaProvider>
   );
 }
