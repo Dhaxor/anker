@@ -14,8 +14,8 @@
         "usesNonExemptEncryption": false
       },
       "infoPlist": {
-        "NSMicrophoneUsageDescription": "Anker hört mit, während Sie deutsche Sätze laut üben, um Ihnen Rückmeldung zu geben.",
-        "NSSpeechRecognitionUsageDescription": "Die Spracherkennung läuft auf Ihrem Gerät und prüft die Sätze, die Sie laut üben."
+        "NSMicrophoneUsageDescription": "Anker hï¿½rt mit, wï¿½hrend Sie deutsche Sï¿½tze laut ï¿½ben, um Ihnen Rï¿½ckmeldung zu geben.",
+        "NSSpeechRecognitionUsageDescription": "Die Spracherkennung lï¿½uft auf Ihrem Gerï¿½t und prï¿½ft die Sï¿½tze, die Sie laut ï¿½ben."
       }
     },
     "android": {
@@ -33,7 +33,8 @@
     "scheme": "curo",
     "newArchEnabled": true,
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-audio"
     ],
     "experiments": {
       "typedRoutes": true
