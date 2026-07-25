@@ -56,7 +56,9 @@ export const palette = {
   },
 } as const;
 
-export type ThemeColors = (typeof palette)["light"];
+/** Widened so the dark palette is assignable too — `as const` above would
+ *  otherwise pin every value to its light-mode literal. */
+export type ThemeColors = { [K in keyof (typeof palette)["light"]]: string };
 
 /** 8-point grid. Nothing outside this scale. */
 export const space = {
