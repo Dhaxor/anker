@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { GraduationCap, Flame, ChevronRight, Target, BookOpen } from "lucide-react-native";
+import { GraduationCap, Flame, ChevronRight, Target, BookOpen, AlertTriangle } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import { useProgress } from "@/contexts/ProgressContext";
 import { BUNDESLAENDER, EXAM_PASS_MARK, EXAM_TOTAL } from "@/lib/questionBank";
@@ -145,6 +145,25 @@ export default function HomeScreen() {
             <Text style={s.statLabel}>insgesamt</Text>
           </View>
         </View>
+
+        <TouchableOpacity
+          style={s.secondary}
+          activeOpacity={0.7}
+          testID="open-review"
+          onPress={() => {
+            void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            router.push("/review");
+          }}
+        >
+          <View style={s.secondaryIcon}>
+            <AlertTriangle size={18} color={c.primary} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={s.secondaryTitle}>Schwachstellen</Text>
+            <Text style={s.secondarySub}>Was Sie immer wieder falsch beantworten</Text>
+          </View>
+          <ChevronRight size={18} color={c.textMuted} />
+        </TouchableOpacity>
 
         <TouchableOpacity
           style={s.secondary}
