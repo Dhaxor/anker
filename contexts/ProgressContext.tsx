@@ -12,6 +12,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Card, Grade, dueCards, newCard, review } from "@/lib/fsrs";
 import { CardMap, Readiness, readiness } from "@/lib/readiness";
 import { Bundesland, Question, questionsFor } from "@/lib/questionBank";
+import { isoDay, streakFrom } from "@/lib/streak";
 
 const CARDS_KEY = "anker.cards.v1";
 const REGION_KEY = "anker.region.v1";
@@ -43,31 +44,6 @@ interface ProgressValue {
 }
 
 const Ctx = createContext<ProgressValue | null>(null);
-
-function isoDay(ms: number): string {
-  const d = new Date(ms);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
-    d.getDate()
-  ).padStart(2, "0")}`;
-}
-
-/** Consecutive days ending today (or yesterday, so an unfinished day is forgiving). */
-export function streakFrom(days: string[], now: number): number {
-  if (days.length === 0) return 0;
-  const set = new Set(days);
-  const dayMs = 86_400_000;
-  let cursor = now;
-  if (!set.has(isoDay(cursor))) {
-    cursor -= dayMs;
-    if (!set.has(isoDay(cursor))) return 0;
-  }
-  let count = 0;
-  while (set.has(isoDay(cursor))) {
-    count += 1;
-    cursor -= dayMs;
-  }
-  return count;
-}
 
 export function ProgressProvider({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);
