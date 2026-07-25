@@ -1,13 +1,22 @@
 {
   "expo": {
-    "name": "lingua-app",
-    "slug": "lingua-app",
+    "name": "Curo",
+    "slug": "curo-medical-spanish",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "bundleIdentifier": "app.curo.medspanish",
+      "buildNumber": "1",
+      "config": {
+        "usesNonExemptEncryption": false
+      },
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "Curo listens while you practise saying clinical phrases out loud, so it can show you how you did.",
+        "NSSpeechRecognitionUsageDescription": "Speech recognition runs on your device to check the phrases you practise out loud."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -20,6 +29,14 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "scheme": "curo",
+    "newArchEnabled": true,
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true
     }
   }
 }

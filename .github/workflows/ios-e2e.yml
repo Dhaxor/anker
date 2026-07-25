@@ -1,0 +1,93 @@
+name: iOS E2E walkthrough
+
+on:
+  push:
+    branches: [e2e-run]
+
+permissions:
+  contents: write
+
+jobs:
+  walkthrough:
+    runs-on: macos-14
+    env:
+      BUNDLE_ID: app.rork.ai-bible-explorer
+      APP_URL: "https://expo.dev/artifacts/eas/XTTbkPQ_rFyFOkZiGYFeoPxdRaXfAHcfn052gsXOfPw.tar.gz"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: E2E run (fully traced)
+        continue-on-error: true
+        run: |
+          mkdir -p app shots
+          exec > >(tee shots/debug.log) 2>&1
+          set -x
+          echo "== download =="
+          curl -L -o app/app.tar.gz "$APP_URL"
+          tar -xzf app/app.tar.gz -C app
+          APP=$(find app -maxdepth 3 -name "*.app" -type d | head -1)
+          echo "APP=$APP"
+          test -n "$APP"
+          echo "== devices =="
+          xcrun simctl list devices available | grep -i iphone || true
+          # Prefer a 6.7" device (iPhone 15 Pro Max -> 1290x2796, the App Store 6.7" slot)
+          LINE=$(xcrun simctl list devices available | grep -i 'iPhone 15 Pro Max' | head -1)
+          [ -z "$LINE" ] && LINE=$(xcrun simctl list devices available | grep -i 'iPhone' | head -1)
+          UDID=$(echo "$LINE" | grep -oiE '[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}')
+          echo "UDID=$UDID"
+          test -n "$UDID"
+          echo "== boot =="
+          xcrun simctl boot "$UDID" || true
+          xcrun simctl bootstatus "$UDID" -b
+          echo "== clean status bar (Apple marketing standard) =="
+          xcrun simctl status_bar "$UDID" override \
+            --time "9:41" \
+            --dataNetwork wifi --wifiMode active --wifiBars 3 \
+            --cellularMode active --cellularBars 4 \
+            --batteryState charged --batteryLevel 100 || true
+          echo "== install + launch shot =="
+          xcrun simctl install "$UDID" "$APP"
+          xcrun simctl launch "$UDID" "$BUNDLE_ID" || true
+          sleep 22
+          xcrun simctl io "$UDID" screenshot shots/00-simctl-launch.png || true
+          xcrun simctl terminate "$UDID" "$BUNDLE_ID" || true
+          echo "== appium install =="
+          npm install -g appium@latest
+          appium --version
+          appium driver install xcuitest
+          appium driver list --installed
+          echo "== e2e deps =="
+          (cd e2e && npm install)
+          echo "== start appium =="
+          appium --port 4723 --base-path / > appium.log 2>&1 &
+          for i in $(seq 1 30); do curl -s http://127.0.0.1:4723/status && break; sleep 2; done
+          echo "== walkthrough =="
+          (cd e2e && UDID="$UDID" BUNDLE_ID="$BUNDLE_ID" SHOTS_DIR=../shots node walkthrough.mjs) || echo "walkthrough exited $?"
+          echo "== appium.log tail =="
+          tail -n 80 appium.log || true
+          echo "== END =="
+
+      - name: Publish results to e2e-results branch
+        if: always()
+        run: |
+          ls -la shots || true
+          mkdir -p /tmp/results
+          cp shots/*.png /tmp/results/ 2>/dev/null || true
+          cp shots/*.log /tmp/results/ 2>/dev/null || true
+          cp appium.log /tmp/results/appium.log 2>/dev/null || true
+          echo "iOS E2E run $(date -u)" > /tmp/results/RUN.txt
+          git config user.email "ci@scripturemate"; git config user.name "ios-e2e"
+          # Orphan branch, then wipe ALL working files (node_modules/app/etc) so only results are committed
+          git checkout --orphan e2e-results
+          git rm -rf --cached . >/dev/null 2>&1 || true
+          git clean -fdx >/dev/null 2>&1 || true
+          cp /tmp/results/* .
+          git add -A
+          git commit -m "iOS e2e results [skip ci]" || echo "nothing to commit"
+          git push -f origin e2e-results
