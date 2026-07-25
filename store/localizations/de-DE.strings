@@ -1,0 +1,26 @@
+/* Primary storefront is Germany and the audience reads German at A2–B1, so
+   every string here is written in plain, short-sentence German. No idioms, no
+   nested clauses — the reader is mid-way through learning this language. */
+
+/* App name (30 max). "Einbürgerungstest" is the head term and stays contiguous;
+   splitting a phrase across name and subtitle is penalised by the algorithm. */
+"name" = "Anker: Einbürgerungstest";
+
+/* Subtitle (30 max). Carries the SECOND head term, "Leben in Deutschland",
+   also contiguous and not duplicated from the name. */
+"subtitle" = "Leben in Deutschland üben";
+
+/* Search Keywords (100 max, comma-separated, no spaces, nothing repeated from
+   name or subtitle — Apple already indexes those). */
+"keywords" = "lid,staatsbürgerschaft,einbürgerung,b1,deutsch,prüfung,integration,quiz,fragen,dtz,bamf,2026";
+
+/* Description — not indexed for search, written for conversion. Leads with the
+   two things a candidate wants to know: is it the real question set, and will
+   it tell me the truth about whether I am ready. */
+"description" = "Anker bereitet Sie auf den Einbürgerungstest und den Test „Leben in Deutschland“ vor — mit allen 460 amtlichen Fragen und einer ehrlichen Antwort auf die wichtigste Frage: Bin ich bereit?\n\nALLE AMTLICHEN FRAGEN, KOSTENLOS\n• 300 allgemeine Fragen und 160 Fragen zu allen 16 Bundesländern\n• Direkt aus dem amtlichen Gesamtfragenkatalog des BAMF\n• Jede Frage wurde mit dem amtlichen Katalog abgeglichen\n• Die Fragen bleiben für immer kostenlos\n\nIHRE BESTEHENSWAHRSCHEINLICHKEIT\n• Kein Fortschrittsbalken, sondern eine echte Prognose\n• „Sie würden heute 24 von 33 Punkten erreichen“\n• Sie sehen sofort, ob die 17 Punkte zum Bestehen reichen\n\nPRÜFUNG SIMULIEREN\n• 33 Fragen, 60 Minuten — genau wie im Amt\n• 30 allgemeine Fragen und 3 aus Ihrem Bundesland\n• Ergebnis mit klarer Auswertung: bestanden oder nicht\n\nGEZIELT ÜBEN STATT ALLES WIEDERHOLEN\n• Anker merkt sich, welche Fragen Ihnen schwerfallen\n• Wissenschaftlich erprobte Wiederholung zur richtigen Zeit\n• Ihre Schwachstellen auf einen Blick, nach Häufigkeit sortiert\n\nOHNE INTERNET, OHNE KONTO\n• Funktioniert vollständig offline — auch in der Bahn\n• Keine Anmeldung, keine E-Mail, keine Daten an Dritte\n• Ihr Fortschritt bleibt auf Ihrem Gerät\n\nAnker ist keine amtliche App des BAMF. Die Fragen stammen aus dem öffentlich veröffentlichten Gesamtfragenkatalog.\n\nLaden Sie Anker und gehen Sie vorbereitet in die Prüfung.";
+
+/* Promotional Text (170 max — not indexed, editable without review) */
+"promotionalText" = "Neu: Anker sagt Ihnen, wie viele Punkte Sie heute erreichen würden — und welche Fragen Ihnen noch fehlen. Alle 460 amtlichen Fragen kostenlos.";
+
+/* What's New (1.0.0) */
+"whatsNew" = "Die erste Version von Anker:\n\n• Alle 460 amtlichen Fragen — 300 allgemeine und 160 aus den Bundesländern\n• Ihre Bestehenswahrscheinlichkeit statt eines Fortschrittsbalkens\n• Prüfungssimulation mit 33 Fragen und 60 Minuten\n• Schwachstellen: die Fragen, die Sie immer wieder falsch beantworten\n• Intelligente Wiederholung, damit Sie zur richtigen Zeit üben\n• Vollständig offline, ohne Konto";

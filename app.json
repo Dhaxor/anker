@@ -16,7 +16,8 @@
       "infoPlist": {
         "NSMicrophoneUsageDescription": "Anker h�rt mit, w�hrend Sie deutsche S�tze laut �ben, um Ihnen R�ckmeldung zu geben.",
         "NSSpeechRecognitionUsageDescription": "Die Spracherkennung l�uft auf Ihrem Ger�t und pr�ft die S�tze, die Sie laut �ben."
-      }
+      },
+      "icon": "./assets/icon.png"
     },
     "android": {
       "adaptiveIcon": {
@@ -28,7 +29,8 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
     },
     "scheme": "curo",
     "newArchEnabled": true,
@@ -38,6 +40,13 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FBFAF8"
+    },
+    "primaryColor": "#0E7C72",
+    "locales": {}
   }
 }
