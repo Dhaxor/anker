@@ -22,9 +22,13 @@ describe("free tier", () => {
     expect(canUse("exam", { pro: false, examsTaken: 7 })).toBe(false);
   });
 
-  test("weak spots and readiness are paid", () => {
+  test("readiness is free — it is the hook, not the product", () => {
+    expect(canUse("readiness", free)).toBe(true);
+    expect(canUse("readiness", { pro: false, examsTaken: 99 })).toBe(true);
+  });
+
+  test("weak-spot targeting is paid", () => {
     expect(canUse("weakSpots", free)).toBe(false);
-    expect(canUse("readiness", free)).toBe(false);
   });
 
   test("reports how many free exams are left", () => {

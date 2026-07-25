@@ -13,9 +13,9 @@
 
 export type Feature =
   | "practice"      // free: unlimited drilling of the whole catalogue
-  | "exam"          // paid: timed 33-question simulator
-  | "weakSpots"     // paid: lapse-ranked trouble list + topic strengths
-  | "readiness";    // paid: expected score + pass probability
+  | "readiness"     // free: expected score + pass probability
+  | "exam"          // 1 free, then paid: timed 33-question simulator
+  | "weakSpots";    // paid: lapse-ranked trouble list + topic strengths
 
 export const PRODUCT_ID = "app.anker.einbuergerung.pro";
 
@@ -28,7 +28,11 @@ export interface EntitlementState {
   examsTaken: number;
 }
 
-const FREE_FEATURES: Feature[] = ["practice"];
+// Readiness is free on purpose. It is the reason to install and the reason to
+// buy: "you would score 8 out of 33" is what turns a browser into someone with
+// a problem. Hiding it behind the paywall would make the app look like every
+// other quiz app on the shelf, and would sell the cure before the diagnosis.
+const FREE_FEATURES: Feature[] = ["practice", "readiness"];
 
 export function canUse(feature: Feature, state: EntitlementState): boolean {
   if (state.pro) return true;

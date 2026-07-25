@@ -12,6 +12,7 @@ import { useRouter } from "expo-router";
 import { ChevronLeft, AlertTriangle, Check, TrendingDown } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import { useProgress } from "@/contexts/ProgressContext";
+import { useEntitlement } from "@/contexts/EntitlementContext";
 import { useTheme } from "@/hooks/useTheme";
 import { troubleSpots, weakestCategories, type Scored, type CategoryStanding } from "@/lib/review";
 import { space, type, radius, elevation, MIN_TAP, type ThemeColors } from "@/constants/theme";
@@ -22,16 +23,21 @@ export default function ReviewScreen() {
   const c = useTheme();
   const s = useMemo(() => styles(c), [c]);
   const { ready, region, cards } = useProgress();
+  const { can } = useEntitlement();
 
   const [spots, setSpots] = useState<Scored[] | null>(null);
   const [topics, setTopics] = useState<CategoryStanding[]>([]);
 
   useEffect(() => {
+    if (ready && !can("weakSpots")) {
+      router.replace("/paywall");
+      return;
+    }
     if (!ready || !region) return;
     const now = Date.now();
     setSpots(troubleSpots(cards, region, now, 25));
     setTopics(weakestCategories(cards, region, now).slice(0, 4));
-  }, [ready, region, cards]);
+  }, [ready, region, cards, can, router]);
 
   const [openId, setOpenId] = useState<string | null>(null);
 

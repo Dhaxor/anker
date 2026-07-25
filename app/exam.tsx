@@ -14,6 +14,7 @@ import { useRouter } from "expo-router";
 import { X, ArrowRight, Award, RotateCcw } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import { useProgress } from "@/contexts/ProgressContext";
+import { useEntitlement } from "@/contexts/EntitlementContext";
 import { GRADE } from "@/lib/fsrs";
 import {
   EXAM_MINUTES,
@@ -37,6 +38,7 @@ export default function ExamScreen() {
   const c = scheme === "dark" ? palette.dark : palette.light;
   const s = useMemo(() => styles(c), [c]);
   const { ready, region, answer, recordAttempt } = useProgress();
+  const { can, noteExamTaken } = useEntitlement();
 
   const [questions, setQuestions] = useState<Question[] | null>(null);
   const [index, setIndex] = useState(0);
@@ -46,12 +48,16 @@ export default function ExamScreen() {
   const graded = useRef(false);
 
   useEffect(() => {
+    if (ready && !can("exam")) {
+      router.replace("/paywall");
+      return;
+    }
     if (ready && region && questions === null) {
       const exam = buildExam(region, Date.now());
       setQuestions(exam);
       setPicks(Array(exam.length).fill(null));
     }
-  }, [ready, region, questions]);
+  }, [ready, region, questions, can, router]);
 
   // Real exams are timed; practising untimed then meeting a clock on the day is
   // the classic failure mode.
@@ -77,11 +83,12 @@ export default function ExamScreen() {
     // Feed the result back into the scheduler so the exam doubles as a review.
     questions.forEach((q, i) => answer(q.id, picks[i] === q.correct ? GRADE.GOOD : GRADE.AGAIN));
     recordAttempt(correct, passed);
+    noteExamTaken();
     void Haptics.notificationAsync(
       passed ? Haptics.NotificationFeedbackType.Success : Haptics.NotificationFeedbackType.Warning
     );
     setSubmitted(true);
-  }, [questions, picks, answer, recordAttempt]);
+  }, [questions, picks, answer, recordAttempt, noteExamTaken]);
 
   useEffect(() => {
     if (secondsLeft === 0 && questions !== null && !submitted) finish();
