@@ -10,7 +10,15 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { GraduationCap, Flame, ChevronRight, Target, BookOpen, AlertTriangle } from "lucide-react-native";
+import {
+  GraduationCap,
+  Flame,
+  ChevronRight,
+  Target,
+  BookOpen,
+  AlertTriangle,
+  Settings as SettingsIcon,
+} from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import { useProgress } from "@/contexts/ProgressContext";
 import { BUNDESLAENDER, EXAM_PASS_MARK, EXAM_TOTAL } from "@/lib/questionBank";
@@ -97,12 +105,25 @@ export default function HomeScreen() {
             <Text style={s.eyebrow}>Einbürgerungstest</Text>
             <Text style={s.h1}>{region}</Text>
           </View>
-          {streak > 0 && (
-            <View style={s.streak} testID="streak-chip">
-              <Flame size={14} color={c.warning} />
-              <Text style={s.streakText}>{streak}</Text>
-            </View>
-          )}
+          <View style={s.headerRight}>
+            {streak > 0 && (
+              <View style={s.streak} testID="streak-chip">
+                <Flame size={14} color={c.warning} />
+                <Text style={s.streakText}>{streak}</Text>
+              </View>
+            )}
+            <TouchableOpacity
+              testID="open-settings"
+              style={s.gear}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              onPress={() => {
+                void Haptics.selectionAsync();
+                router.push("/settings");
+              }}
+            >
+              <SettingsIcon size={19} color={c.textMuted} />
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Hero: the one question a candidate actually has. */}
@@ -242,6 +263,8 @@ const styles = (c: ThemeColors) =>
       marginBottom: space.lg,
     },
     eyebrow: { ...type.caption, color: c.textMuted, marginBottom: space.xs },
+    headerRight: { flexDirection: "row", alignItems: "center", gap: space.sm },
+    gear: { width: 34, height: 34, alignItems: "center", justifyContent: "center" },
     streak: {
       flexDirection: "row",
       alignItems: "center",
