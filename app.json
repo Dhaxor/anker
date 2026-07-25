@@ -1,21 +1,21 @@
 {
   "expo": {
-    "name": "Curo",
-    "slug": "curo-medical-spanish",
+    "name": "Anker",
+    "slug": "anker-einbuergerungstest",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "app.curo.medspanish",
+      "bundleIdentifier": "app.anker.einbuergerung",
       "buildNumber": "1",
       "config": {
         "usesNonExemptEncryption": false
       },
       "infoPlist": {
-        "NSMicrophoneUsageDescription": "Curo listens while you practise saying clinical phrases out loud, so it can show you how you did.",
-        "NSSpeechRecognitionUsageDescription": "Speech recognition runs on your device to check the phrases you practise out loud."
+        "NSMicrophoneUsageDescription": "Anker hört mit, während Sie deutsche Sätze laut üben, um Ihnen Rückmeldung zu geben.",
+        "NSSpeechRecognitionUsageDescription": "Die Spracherkennung läuft auf Ihrem Gerät und prüft die Sätze, die Sie laut üben."
       }
     },
     "android": {
