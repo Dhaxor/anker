@@ -1,5 +1,12 @@
 import { describe, expect, test } from "bun:test";
-import { normalCdf, pCorrect, readiness, readinessLabel, type CardMap } from "./readiness";
+import {
+  normalCdf,
+  pCorrect,
+  readiness,
+  readinessLabel,
+  displayPercent,
+  type CardMap,
+} from "./readiness";
 import { newCard, review, GRADE, type Card } from "./fsrs";
 import {
   generalQuestions,
@@ -150,5 +157,19 @@ describe("readinessLabel", () => {
     expect(at(0.5)).toBe("borderline");
     expect(at(0.8)).toBe("ready");
     expect(at(0.99)).toBe("confident");
+  });
+});
+
+describe("displayPercent", () => {
+  test("never promises certainty, and never shows a bare zero", () => {
+    expect(displayPercent(1)).toBe(99);
+    expect(displayPercent(0.999)).toBe(99);
+    expect(displayPercent(0)).toBe(1);
+    expect(displayPercent(0.0001)).toBe(1);
+  });
+
+  test("rounds normally in between", () => {
+    expect(displayPercent(0.5)).toBe(50);
+    expect(displayPercent(0.734)).toBe(73);
   });
 });

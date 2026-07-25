@@ -22,7 +22,7 @@ import {
 import * as Haptics from "expo-haptics";
 import { useProgress } from "@/contexts/ProgressContext";
 import { BUNDESLAENDER, EXAM_PASS_MARK, EXAM_TOTAL } from "@/lib/questionBank";
-import { readinessLabel } from "@/lib/readiness";
+import { readinessLabel, displayPercent } from "@/lib/readiness";
 import { palette, space, type, radius, elevation, MIN_TAP, type ThemeColors } from "@/constants/theme";
 
 const LABEL_COPY = {
@@ -87,7 +87,7 @@ export default function HomeScreen() {
   const r = readiness!;
   const label = readinessLabel(r);
   const copy = LABEL_COPY[label];
-  const pct = Math.round(r.passProbability * 100);
+  const pct = displayPercent(r.passProbability);
   const accent = label === "not-ready" ? c.warning : label === "borderline" ? c.warning : c.success;
   const accentSoft = label === "ready" || label === "confident" ? c.successSoft : c.warningSoft;
 

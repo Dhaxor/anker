@@ -103,6 +103,18 @@ export function readiness(cards: CardMap, region: Bundesland, now: number): Read
   };
 }
 
+/**
+ * Pass probability as a percentage for display.
+ *
+ * Capped at 99 and floored at 1: the model is an estimate from a memory curve,
+ * not a guarantee, and printing "100%" would promise a certainty we cannot
+ * have about an exam nobody has sat yet. Overclaiming here would undermine the
+ * one number the whole product is trusted for.
+ */
+export function displayPercent(passProbability: number): number {
+  return Math.min(99, Math.max(1, Math.round(passProbability * 100)));
+}
+
 /** Short, honest label for the readiness headline. */
 export function readinessLabel(r: Readiness): "not-ready" | "borderline" | "ready" | "confident" {
   if (r.passProbability >= 0.95) return "confident";
