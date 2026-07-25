@@ -36,7 +36,7 @@ export default function ReviewScreen() {
     if (!ready || !region) return;
     const now = Date.now();
     setSpots(troubleSpots(cards, region, now, 25));
-    setTopics(weakestCategories(cards, region, now).slice(0, 4));
+    setTopics(weakestCategories(cards, region, now).filter((t) => t.strength < 0.9).slice(0, 4));
   }, [ready, region, cards, can, router]);
 
   const [openId, setOpenId] = useState<string | null>(null);
@@ -67,7 +67,7 @@ export default function ReviewScreen() {
         >
           {topics.length > 0 && (
             <>
-              <Text style={s.sectionLabel}>Themen</Text>
+              <Text style={s.sectionLabel}>Themen mit Nachholbedarf</Text>
               {topics.map((t) => (
                 <View key={t.category} style={s.topicRow} testID={`topic-${t.category}`}>
                   <TrendingDown size={16} color={t.strength < 0.7 ? c.warning : c.textMuted} />
