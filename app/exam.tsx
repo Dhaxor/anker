@@ -8,6 +8,8 @@ import {
   useColorScheme,
   ActivityIndicator,
   Alert,
+  Animated,
+  Easing,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -94,6 +96,38 @@ export default function ExamScreen() {
     if (secondsLeft === 0 && questions !== null && !submitted) finish();
   }, [secondsLeft, questions, submitted, finish]);
 
+  // The peak moment of the whole product: the verdict. It earns a real
+  // entrance — the badge springs in and the score lifts — because this is the
+  // moment the user came for. Deliberately restrained: this is a government
+  // exam, and confetti over "Noch nicht bestanden" would be tone deaf.
+  const badgeScale = useRef(new Animated.Value(0.8)).current;
+  const resultFade = useRef(new Animated.Value(0)).current;
+  const resultLift = useRef(new Animated.Value(12)).current;
+
+  useEffect(() => {
+    if (!submitted) {
+      badgeScale.setValue(0.8);
+      resultFade.setValue(0);
+      resultLift.setValue(12);
+      return;
+    }
+    Animated.parallel([
+      Animated.spring(badgeScale, { toValue: 1, friction: 5, tension: 90, useNativeDriver: true }),
+      Animated.timing(resultFade, {
+        toValue: 1,
+        duration: 320,
+        easing: Easing.out(Easing.quad),
+        useNativeDriver: true,
+      }),
+      Animated.timing(resultLift, {
+        toValue: 0,
+        duration: 320,
+        easing: Easing.out(Easing.quad),
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [submitted, badgeScale, resultFade, resultLift]);
+
   if (questions === null) {
     return (
       <View style={[s.screen, s.centered]}>
@@ -102,7 +136,6 @@ export default function ExamScreen() {
     );
   }
 
-  // The peak moment of the whole product: the verdict.
   if (submitted) {
     const passed = score >= EXAM_PASS_MARK;
     const accent = passed ? c.success : c.warning;
@@ -111,15 +144,24 @@ export default function ExamScreen() {
         style={s.screen}
         contentContainerStyle={[s.resultWrap, { paddingTop: insets.top + space.xxl, paddingBottom: insets.bottom + space.xl }]}
       >
-        <View style={[s.resultBadge, { backgroundColor: passed ? c.successSoft : c.warningSoft }]}>
+        <Animated.View
+          style={[
+            s.resultBadge,
+            { backgroundColor: passed ? c.successSoft : c.warningSoft, transform: [{ scale: badgeScale }] },
+          ]}
+        >
           <Award size={34} color={accent} />
-        </View>
-        <Text style={[s.resultScore, { color: accent }]} testID="exam-score">
-          {score} / {EXAM_TOTAL}
-        </Text>
-        <Text style={s.resultHead} testID="exam-verdict">
-          {passed ? "Bestanden" : "Noch nicht bestanden"}
-        </Text>
+        </Animated.View>
+        <Animated.View
+          style={{ alignItems: "center", opacity: resultFade, transform: [{ translateY: resultLift }] }}
+        >
+          <Text style={[s.resultScore, { color: accent }]} testID="exam-score">
+            {score} / {EXAM_TOTAL}
+          </Text>
+          <Text style={s.resultHead} testID="exam-verdict">
+            {passed ? "Bestanden" : "Noch nicht bestanden"}
+          </Text>
+        </Animated.View>
         <Text style={s.resultSub}>
           {passed
             ? `Sie liegen ${score - EXAM_PASS_MARK} Punkte über der Grenze von ${EXAM_PASS_MARK}. So sicher würden Sie auch im Amt bestehen.`
@@ -181,10 +223,14 @@ export default function ExamScreen() {
         contentContainerStyle={[s.content, { paddingBottom: insets.bottom + 120 }]}
         showsVerticalScrollIndicator={false}
       >
-        {q.region !== "Allgemein" && <Text style={s.regionTag}>{q.region}</Text>}
-        <Text style={s.question} testID="exam-question">
-          {q.question}
-        </Text>
+        <View style={s.questionBlock}>
+          {q.region !== "Allgemein" && <Text style={s.regionTag}>{q.region}</Text>}
+          <Text style={s.question} testID="exam-question">
+            {q.question}
+          </Text>
+        </View>
+        {/* Bottom-anchored so every option sits in the thumb zone. */}
+        <View style={s.options}>
         {q.options.map((opt, i) => {
           const chosen = picks[index] === i;
           return (
@@ -203,6 +249,7 @@ export default function ExamScreen() {
             </TouchableOpacity>
           );
         })}
+        </View>
         {/* No feedback until the end — that is what makes it a rehearsal. */}
       </ScrollView>
 
@@ -257,7 +304,9 @@ const styles = (c: ThemeColors) =>
     counter: { ...type.caption, color: c.textMuted },
     timer: { ...type.captionStrong, color: c.textSecondary, fontVariant: ["tabular-nums"] },
 
-    content: { paddingHorizontal: space.lg, paddingTop: space.lg },
+    content: { paddingHorizontal: space.lg, paddingTop: space.lg, flexGrow: 1 },
+    questionBlock: { flex: 1, justifyContent: "center", paddingBottom: space.lg },
+    options: { marginTop: "auto" },
     regionTag: { ...type.caption, color: c.primary, marginBottom: space.sm },
     question: { ...type.title, color: c.text, marginBottom: space.lg, lineHeight: 28 },
 
