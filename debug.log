@@ -1,0 +1,314 @@
++ echo '== download =='
+== download ==
++ curl -L -o app/app.tar.gz https://expo.dev/artifacts/eas/J1lbNyo20J6A-zDwgHwlsqCa1oKcSwEt6kolGI2KAfY.tar.gz
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100    81    0    81    0     0    638      0 --:--:-- --:--:-- --:--:--   642
+100   624  100   624    0     0   2590      0 --:--:-- --:--:-- --:--:--  2590
+100 23.8M  100 23.8M    0     0  40.6M      0 --:--:-- --:--:-- --:--:-- 40.6M
++ tar -xzf app/app.tar.gz -C app
+++ find app -maxdepth 3 -name '*.app' -type d
+++ head -1
++ APP=app/Anker.app
++ echo APP=app/Anker.app
+APP=app/Anker.app
++ test -n app/Anker.app
++ echo '== devices =='
+== devices ==
++ xcrun simctl list devices available
++ grep -i iphone
+    iPhone 15 Pro (F057F93D-2562-418F-AB4C-35C3B965CD8D) (Shutdown) 
+    iPhone 15 Pro Max (087AF5AE-046A-47BC-9A3A-3939EE1FE321) (Shutdown) 
+    iPhone 15 (0021405E-8418-41AC-BC7C-1DCE3BF68FCD) (Shutdown) 
+    iPhone 15 Plus (E8DE5083-20B6-44B7-89B6-2CECE2E5633F) (Shutdown) 
+    iPhone SE (3rd generation) (207BD571-13EA-4F89-8290-50BA2AD03E2D) (Shutdown) 
+    iPhone 15 Pro (65471791-75F2-4CF5-98DC-DD66F809D095) (Shutdown) 
+    iPhone 15 Pro Max (8C971C09-7334-495D-8245-ADA43AA5E637) (Shutdown) 
+    iPhone 15 (13FD2836-BA4F-4AA5-B54E-50D124BBAE99) (Shutdown) 
+    iPhone 15 Plus (71C38D13-F059-47C7-BCCD-BF6571A6F7F1) (Shutdown) 
+    iPhone SE (3rd generation) (9AE82185-1FB8-49F1-8643-40D1FEFA513A) (Shutdown) 
+    iPhone 15 Pro (B24657D9-26B4-48F5-9D1A-62A84461E1F0) (Shutdown) 
+    iPhone 15 Pro Max (70B3ADD7-C975-4ED5-9094-A5C3BBAC1D9F) (Shutdown) 
+    iPhone 15 (63CB9FA1-623A-45D1-B9AA-89B2B10B97F3) (Shutdown) 
+    iPhone 15 Plus (B952C60F-6A6D-4B96-9764-ACABDAA37051) (Shutdown) 
+    iPhone SE (3rd generation) (AB6BB91B-AAE3-49E4-94CF-D2D6F861E33F) (Shutdown) 
+    iPhone 15 Pro (42725BA4-8A0A-4D90-B272-DB970F21BEA0) (Shutdown) 
+    iPhone 15 Pro Max (52D2F37C-CA9F-4293-A015-E5DFC3B360A7) (Shutdown) 
+    iPhone 15 (287A7916-2BD1-4674-8A22-38756D5658F4) (Shutdown) 
+    iPhone 15 Plus (8888EA89-AFF6-45E8-86DB-D93CEDDA2262) (Shutdown) 
+    iPhone SE (3rd generation) (7217C8FE-3657-4347-BA57-30B1ECAC3B6E) (Shutdown) 
+    iPhone 16 Pro (87898CFC-9881-4D80-B2F2-807B97909EDE) (Shutdown) 
+    iPhone 16 Pro Max (FB549212-E828-4FA4-82BE-8CD7185C099B) (Shutdown) 
+    iPhone 16 (E5D65BC2-373C-4724-B290-2F7ED26DE14F) (Shutdown) 
+    iPhone 16 Plus (025E2B05-71A0-40AF-A021-1D9253724244) (Shutdown) 
+    iPhone SE (3rd generation) (CE505324-B3F4-4B42-8BC5-419D92D4505A) (Shutdown) 
+    iPhone 16 Pro (710F2619-BD89-49F5-859F-33B9C48B36CE) (Shutdown) 
+    iPhone 16 Pro Max (78A8FD46-29F2-4131-B9D2-EE5B7C4507DF) (Shutdown) 
+    iPhone 16 (C5890B99-B633-4FCF-902C-52BB8E932E8D) (Shutdown) 
+    iPhone 16 Plus (620D90EA-A00C-454B-B0C4-7D757D85B0DE) (Shutdown) 
+    iPhone SE (3rd generation) (4836E8B8-5A29-4F7A-8ED1-5F4C7128F1DA) (Shutdown) 
+++ xcrun simctl list devices available
+++ grep -i 'iPhone 15 Pro Max'
+++ head -1
++ LINE='    iPhone 15 Pro Max (087AF5AE-046A-47BC-9A3A-3939EE1FE321) (Shutdown) '
++ '[' -z '    iPhone 15 Pro Max (087AF5AE-046A-47BC-9A3A-3939EE1FE321) (Shutdown) ' ']'
+++ echo '    iPhone 15 Pro Max (087AF5AE-046A-47BC-9A3A-3939EE1FE321) (Shutdown) '
+++ grep -oiE '[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}'
++ UDID=087AF5AE-046A-47BC-9A3A-3939EE1FE321
++ echo UDID=087AF5AE-046A-47BC-9A3A-3939EE1FE321
+UDID=087AF5AE-046A-47BC-9A3A-3939EE1FE321
++ test -n 087AF5AE-046A-47BC-9A3A-3939EE1FE321
++ echo '== boot =='
+== boot ==
++ xcrun simctl boot 087AF5AE-046A-47BC-9A3A-3939EE1FE321
++ xcrun simctl bootstatus 087AF5AE-046A-47BC-9A3A-3939EE1FE321 -b
+Monitoring boot status for iPhone 15 Pro Max (087AF5AE-046A-47BC-9A3A-3939EE1FE321).
+[2026-07-26 03:42:11 +0000] Status=2, isTerminal=NO, Elapsed=00:16.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:12 seconds
+
+[2026-07-26 03:42:12 +0000] Status=2, isTerminal=NO, Elapsed=00:17.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:13 seconds
+
+[2026-07-26 03:42:13 +0000] Status=2, isTerminal=NO, Elapsed=00:18.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:14 seconds
+
+[2026-07-26 03:42:14 +0000] Status=2, isTerminal=NO, Elapsed=00:19.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:15 seconds
+
+[2026-07-26 03:42:15 +0000] Status=2, isTerminal=NO, Elapsed=00:20.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:16 seconds
+
+[2026-07-26 03:42:16 +0000] Status=2, isTerminal=NO, Elapsed=00:21.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:17 seconds
+
+[2026-07-26 03:42:17 +0000] Status=2, isTerminal=NO, Elapsed=00:22.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:18 seconds
+
+[2026-07-26 03:42:20 +0000] Status=2, isTerminal=NO, Elapsed=00:25.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.WebBookmarks.migrator (WebBookmarks.migrator)
+		Migration Elapsed:00:19 seconds
+
+[2026-07-26 03:42:24 +0000] Status=4294967295, isTerminal=YES, Elapsed=00:29.
+	Finished
+
++ echo '== clean status bar (Apple marketing standard) =='
+== clean status bar (Apple marketing standard) ==
++ xcrun simctl status_bar 087AF5AE-046A-47BC-9A3A-3939EE1FE321 override --time 9:41 --dataNetwork wifi --wifiMode active --wifiBars 3 --cellularMode active --cellularBars 4 --batteryState charged --batteryLevel 100
++ echo '== install + launch shot =='
+== install + launch shot ==
++ xcrun simctl install 087AF5AE-046A-47BC-9A3A-3939EE1FE321 app/Anker.app
++ xcrun simctl launch 087AF5AE-046A-47BC-9A3A-3939EE1FE321 app.anker.einbuergerung
+app.anker.einbuergerung: 20125
++ sleep 22
++ xcrun simctl io 087AF5AE-046A-47BC-9A3A-3939EE1FE321 screenshot shots/00-simctl-launch.png
+Detected file type 'PNG' from extension
+Wrote screenshot to: shots/00-simctl-launch.png
++ xcrun simctl terminate 087AF5AE-046A-47BC-9A3A-3939EE1FE321 app.anker.einbuergerung
++ echo '== appium install =='
+== appium install ==
++ npm install -g appium@latest
+
+added 296 packages in 12s
+
+68 packages are looking for funding
+  run `npm fund` for details
++ appium --version
+3.6.0
++ appium driver install xcuitest
+- Checking if 'appium-xcuitest-driver' is compatible
+✔ Checking if 'appium-xcuitest-driver' is compatible
+- Installing 'xcuitest'
+✔ Installing 'xcuitest'
+- Validating 'xcuitest'
+✔ Validating 'xcuitest'
+ℹ Driver xcuitest@12.1.0 successfully installed
+- automationName: XCUITest
+- platformNames: ["iOS","tvOS"]
++ appium driver list --installed
+- Listing installed drivers (rerun with --verbose for more info)
+✔ Listing installed drivers (rerun with --verbose for more info)
+- xcuitest@12.1.0 [installed (npm)]
++ echo '== e2e deps =='
+== e2e deps ==
++ cd e2e
++ npm install
+npm warn deprecated whatwg-encoding@3.1.1: Use @exodus/bytes instead for a more spec-conformant and faster implementation
+npm warn deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+
+added 247 packages, and audited 248 packages in 7s
+
+59 packages are looking for funding
+  run `npm fund` for details
+
+10 high severity vulnerabilities
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
++ echo '== start appium =='
+== start appium ==
++ appium --port 4723 --base-path /
+++ seq 1 30
++ for i in '$(seq 1 30)'
++ curl -s http://127.0.0.1:4723/status
++ sleep 2
++ for i in '$(seq 1 30)'
++ curl -s http://127.0.0.1:4723/status
+{"value":{"ready":true,"message":"The server is ready to accept new connections","build":{"version":"3.6.0"}}}+ break
++ echo '== walkthrough =='
+== walkthrough ==
++ cd e2e
++ UDID=087AF5AE-046A-47BC-9A3A-3939EE1FE321
++ BUNDLE_ID=app.anker.einbuergerung
++ SHOTS_DIR=../shots
++ node walkthrough.mjs
+2026-07-26T03:46:08.983Z ERROR webdriver: Error: WebDriverError: Request failed with error code UND_ERR_HEADERS_TIMEOUT when running "http://127.0.0.1:4723/session" with method "POST"
+    at FetchRequest._libRequest (file:///Users/runner/work/anker/anker/e2e/node_modules/webdriver/build/node.js:2191:13)
+    at async FetchRequest._request (file:///Users/runner/work/anker/anker/e2e/node_modules/webdriver/build/node.js:2217:20)
+    at async startWebDriverSession (file:///Users/runner/work/anker/anker/e2e/node_modules/webdriver/build/node.js:1357:16)
+    at async _WebDriver.newSession (file:///Users/runner/work/anker/anker/e2e/node_modules/webdriver/build/node.js:1779:41)
+    at async remote (file:///Users/runner/work/anker/anker/e2e/node_modules/webdriverio/build/node.js:10179:20)
+    at async connect (file:///Users/runner/work/anker/anker/e2e/walkthrough.mjs:87:14)
+    at async main (file:///Users/runner/work/anker/anker/e2e/walkthrough.mjs:110:18)
+[e2e] session attempt 1/4 failed: WebDriverError: Request failed with error code UND_ERR_HEADERS_TIMEOUT when running "http://127.0.0.1:4723/session" with method "POST"
+2026-07-26T03:48:57.400Z ERROR webdriver: Error: WebDriverError: The operation was aborted due to timeout when running "http://127.0.0.1:4723/session" with method "POST"
+    at FetchRequest._libRequest (file:///Users/runner/work/anker/anker/e2e/node_modules/webdriver/build/node.js:2191:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async FetchRequest._request (file:///Users/runner/work/anker/anker/e2e/node_modules/webdriver/build/node.js:2217:20)
+    at async startWebDriverSession (file:///Users/runner/work/anker/anker/e2e/node_modules/webdriver/build/node.js:1357:16)
+    at async _WebDriver.newSession (file:///Users/runner/work/anker/anker/e2e/node_modules/webdriver/build/node.js:1779:41)
+    at async remote (file:///Users/runner/work/anker/anker/e2e/node_modules/webdriverio/build/node.js:10179:20)
+    at async connect (file:///Users/runner/work/anker/anker/e2e/walkthrough.mjs:87:14)
+    at async main (file:///Users/runner/work/anker/anker/e2e/walkthrough.mjs:110:18)
+[e2e] session attempt 2/4 failed: WebDriverError: The operation was aborted due to timeout when running "http://127.0.0.1:4723/session" with method "POST"
+[e2e] shot ../shots/01-onboarding-bundesland.png
+[e2e] ONBOARDING RESULT: PASS — Bundesland picker on first launch
+[e2e] tapped Bundesland Bayern
+[e2e] shot ../shots/02-home-readiness.png
+[e2e] HOME RESULT: PASS — expected score renders (8)
+[e2e] tapped Üben
+[e2e] shot ../shots/03-practice-question.png
+[e2e] PRACTICE RESULT: PASS — question=true options=true
+[e2e] tapped answer option 1
+[e2e] shot ../shots/04-practice-feedback.png
+[e2e] FEEDBACK RESULT: PASS — answer feedback + Weiter dock
+[e2e] tapped Weiter
+[e2e] tapped close practice
+[e2e] tapped Prüfung simulieren
+[e2e] shot ../shots/05-exam-question.png
+[e2e] EXAM RESULT: PASS — timer=59:56 options=true
+[e2e] tapped leave exam
+[e2e] tapped confirm leave exam
+[e2e] tapped Schwachstellen
+[e2e] shot ../shots/06-schwachstellen.png
+[e2e] REVIEW RESULT: PASS — weak-spots screen opened
+[e2e] tap-failed back element ("~review-back") still not existing after 6000ms
+[e2e] tap-failed Einstellungen element ("~open-settings") still not existing after 12000ms
+[e2e] PRIVACY-LINK RESULT: FAIL — could not open settings
+[e2e] PAYWALL RESULT: FAIL — could not open settings
+[e2e] SUMMARY: 6/8 checks passed
+[e2e] walkthrough complete
++ echo '== appium.log tail =='
+== appium.log tail ==
++ tail -n 80 appium.log
+[38;5;131m[80e88215][0m[38;5;86m[HTTP][0m --> POST /session/80e88215-2c77-48e7-bc85-4f7882d47306/elements {"using":"accessibility id","value":"open-settings"}
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Calling AppiumDriver.findElements() with args: ["accessibility id","open-settings","80e88215-2c77-48e7-bc85-4f7882d47306"]
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Executing command 'findElements'
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Valid locator strategies for this request: xpath, id, name, class name, -ios predicate string, -ios class chain, accessibility id, css selector
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Waiting up to 0 ms for condition
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Matched '/elements' to command name 'findElements'
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Proxying [POST /elements] to [POST http://127.0.0.1:8100/session/692A9C36-3F55-4B17-A505-0FEC428BC76B/elements] with body: {"using":"accessibility id","value":"open-settings"}
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Got response with status 200: {"value":[],"sessionId":"692A9C36-3F55-4B17-A505-0FEC428BC76B"}
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Responding to client with driver.findElements() result: []
+[38;5;131m[80e88215][0m[38;5;86m[HTTP][0m <-- POST /session/80e88215-2c77-48e7-bc85-4f7882d47306/elements 200 36 ms - 12
+[38;5;131m[80e88215][0m[38;5;86m[HTTP][0m --> POST /session/80e88215-2c77-48e7-bc85-4f7882d47306/elements {"using":"accessibility id","value":"open-settings"}
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Calling AppiumDriver.findElements() with args: ["accessibility id","open-settings","80e88215-2c77-48e7-bc85-4f7882d47306"]
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Executing command 'findElements'
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Valid locator strategies for this request: xpath, id, name, class name, -ios predicate string, -ios class chain, accessibility id, css selector
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Waiting up to 0 ms for condition
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Matched '/elements' to command name 'findElements'
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Proxying [POST /elements] to [POST http://127.0.0.1:8100/session/692A9C36-3F55-4B17-A505-0FEC428BC76B/elements] with body: {"using":"accessibility id","value":"open-settings"}
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Got response with status 200: {"value":[],"sessionId":"692A9C36-3F55-4B17-A505-0FEC428BC76B"}
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Responding to client with driver.findElements() result: []
+[38;5;131m[80e88215][0m[38;5;86m[HTTP][0m <-- POST /session/80e88215-2c77-48e7-bc85-4f7882d47306/elements 200 36 ms - 12
+[38;5;131m[80e88215][0m[38;5;86m[HTTP][0m --> POST /session/80e88215-2c77-48e7-bc85-4f7882d47306/elements {"using":"accessibility id","value":"open-settings"}
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Calling AppiumDriver.findElements() with args: ["accessibility id","open-settings","80e88215-2c77-48e7-bc85-4f7882d47306"]
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Executing command 'findElements'
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Valid locator strategies for this request: xpath, id, name, class name, -ios predicate string, -ios class chain, accessibility id, css selector
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Waiting up to 0 ms for condition
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Matched '/elements' to command name 'findElements'
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Proxying [POST /elements] to [POST http://127.0.0.1:8100/session/692A9C36-3F55-4B17-A505-0FEC428BC76B/elements] with body: {"using":"accessibility id","value":"open-settings"}
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Got response with status 200: {"value":[],"sessionId":"692A9C36-3F55-4B17-A505-0FEC428BC76B"}
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Responding to client with driver.findElements() result: []
+[38;5;131m[80e88215][0m[38;5;86m[HTTP][0m <-- POST /session/80e88215-2c77-48e7-bc85-4f7882d47306/elements 200 44 ms - 12
+[38;5;131m[80e88215][0m[38;5;86m[HTTP][0m --> POST /session/80e88215-2c77-48e7-bc85-4f7882d47306/elements {"using":"accessibility id","value":"open-settings"}
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Calling AppiumDriver.findElements() with args: ["accessibility id","open-settings","80e88215-2c77-48e7-bc85-4f7882d47306"]
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Executing command 'findElements'
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Valid locator strategies for this request: xpath, id, name, class name, -ios predicate string, -ios class chain, accessibility id, css selector
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Waiting up to 0 ms for condition
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Matched '/elements' to command name 'findElements'
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Proxying [POST /elements] to [POST http://127.0.0.1:8100/session/692A9C36-3F55-4B17-A505-0FEC428BC76B/elements] with body: {"using":"accessibility id","value":"open-settings"}
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Got response with status 200: {"value":[],"sessionId":"692A9C36-3F55-4B17-A505-0FEC428BC76B"}
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Responding to client with driver.findElements() result: []
+[38;5;131m[80e88215][0m[38;5;86m[HTTP][0m <-- POST /session/80e88215-2c77-48e7-bc85-4f7882d47306/elements 200 41 ms - 12
+[38;5;131m[80e88215][0m[38;5;86m[HTTP][0m --> POST /session/80e88215-2c77-48e7-bc85-4f7882d47306/elements {"using":"accessibility id","value":"open-settings"}
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Calling AppiumDriver.findElements() with args: ["accessibility id","open-settings","80e88215-2c77-48e7-bc85-4f7882d47306"]
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Executing command 'findElements'
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Valid locator strategies for this request: xpath, id, name, class name, -ios predicate string, -ios class chain, accessibility id, css selector
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Waiting up to 0 ms for condition
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Matched '/elements' to command name 'findElements'
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Proxying [POST /elements] to [POST http://127.0.0.1:8100/session/692A9C36-3F55-4B17-A505-0FEC428BC76B/elements] with body: {"using":"accessibility id","value":"open-settings"}
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Got response with status 200: {"value":[],"sessionId":"692A9C36-3F55-4B17-A505-0FEC428BC76B"}
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Responding to client with driver.findElements() result: []
+[38;5;131m[80e88215][0m[38;5;86m[HTTP][0m <-- POST /session/80e88215-2c77-48e7-bc85-4f7882d47306/elements 200 44 ms - 12
+[38;5;131m[80e88215][0m[38;5;86m[HTTP][0m --> POST /session/80e88215-2c77-48e7-bc85-4f7882d47306/elements {"using":"accessibility id","value":"open-settings"}
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Calling AppiumDriver.findElements() with args: ["accessibility id","open-settings","80e88215-2c77-48e7-bc85-4f7882d47306"]
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Executing command 'findElements'
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Valid locator strategies for this request: xpath, id, name, class name, -ios predicate string, -ios class chain, accessibility id, css selector
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Waiting up to 0 ms for condition
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Matched '/elements' to command name 'findElements'
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Proxying [POST /elements] to [POST http://127.0.0.1:8100/session/692A9C36-3F55-4B17-A505-0FEC428BC76B/elements] with body: {"using":"accessibility id","value":"open-settings"}
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Got response with status 200: {"value":[],"sessionId":"692A9C36-3F55-4B17-A505-0FEC428BC76B"}
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Responding to client with driver.findElements() result: []
+[38;5;131m[80e88215][0m[38;5;86m[HTTP][0m <-- POST /session/80e88215-2c77-48e7-bc85-4f7882d47306/elements 200 36 ms - 12
+[38;5;131m[80e88215][0m[38;5;86m[HTTP][0m --> POST /session/80e88215-2c77-48e7-bc85-4f7882d47306/elements {"using":"accessibility id","value":"open-settings"}
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Calling AppiumDriver.findElements() with args: ["accessibility id","open-settings","80e88215-2c77-48e7-bc85-4f7882d47306"]
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Executing command 'findElements'
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Valid locator strategies for this request: xpath, id, name, class name, -ios predicate string, -ios class chain, accessibility id, css selector
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Waiting up to 0 ms for condition
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Matched '/elements' to command name 'findElements'
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Proxying [POST /elements] to [POST http://127.0.0.1:8100/session/692A9C36-3F55-4B17-A505-0FEC428BC76B/elements] with body: {"using":"accessibility id","value":"open-settings"}
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Got response with status 200: {"value":[],"sessionId":"692A9C36-3F55-4B17-A505-0FEC428BC76B"}
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Responding to client with driver.findElements() result: []
+[38;5;131m[80e88215][0m[38;5;86m[HTTP][0m <-- POST /session/80e88215-2c77-48e7-bc85-4f7882d47306/elements 200 35 ms - 12
+[38;5;131m[80e88215][0m[38;5;86m[HTTP][0m --> POST /session/80e88215-2c77-48e7-bc85-4f7882d47306/elements {"using":"accessibility id","value":"open-settings"}
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Calling AppiumDriver.findElements() with args: ["accessibility id","open-settings","80e88215-2c77-48e7-bc85-4f7882d47306"]
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Executing command 'findElements'
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Valid locator strategies for this request: xpath, id, name, class name, -ios predicate string, -ios class chain, accessibility id, css selector
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Waiting up to 0 ms for condition
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Matched '/elements' to command name 'findElements'
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Proxying [POST /elements] to [POST http://127.0.0.1:8100/session/692A9C36-3F55-4B17-A505-0FEC428BC76B/elements] with body: {"using":"accessibility id","value":"open-settings"}
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Got response with status 200: {"value":[],"sessionId":"692A9C36-3F55-4B17-A505-0FEC428BC76B"}
+[38;5;131m[80e88215][0m[38;5;91m[XCUITestDriver@fdf4][0m Responding to client with driver.findElements() result: []
+[38;5;131m[80e88215][0m[38;5;86m[HTTP][0m <-- POST /session/80e88215-2c77-48e7-bc85-4f7882d47306/elements 200 35 ms - 12
++ echo '== END =='
+== END ==
