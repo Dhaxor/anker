@@ -12,14 +12,36 @@ import React, {
   useMemo,
   useState,
 } from "react";
+import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { EntitlementState, canUse, examsRemaining, type Feature } from "@/lib/entitlement";
 
 const PRO_KEY = "anker.pro.v1";
 const EXAMS_KEY = "anker.examsTaken.v1";
 
-/** Flipped on once the IAP product is live in App Store Connect. */
-export const PURCHASES_ENABLED = false;
+/** The non-consumable unlock, created in App Store Connect (IAP 6794763803). */
+export const PRODUCT_ID = "app.anker.einbuergerung.pro";
+
+/**
+ * Purchases run on iOS only. On web (our verification harness) the store
+ * module has no implementation, so every call reports "unavailable" and the
+ * paywall degrades to an explanatory alert rather than throwing.
+ */
+export const PURCHASES_ENABLED = Platform.OS === "ios";
+
+/**
+ * expo-iap is required lazily so that web bundles never pull in a native
+ * module that cannot load there.
+ */
+function iap(): typeof import("expo-iap") | null {
+  if (!PURCHASES_ENABLED) return null;
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    return require("expo-iap") as typeof import("expo-iap");
+  } catch {
+    return null;
+  }
+}
 
 export type PurchaseResult = "purchased" | "cancelled" | "unavailable" | "failed";
 
@@ -87,21 +109,77 @@ export function EntitlementProvider({ children }: { children: React.ReactNode })
   // product exists this stays null and the paywall simply omits the price
   // rather than showing an invented one.
   useEffect(() => {
-    if (!PURCHASES_ENABLED) return;
-    // Wired to expo-iap getProducts() alongside purchase() below.
-    setPriceLabel(null);
-  }, []);
+    const store = iap();
+    if (!store) return;
+    let cancelled = false;
+
+    // Deliver the entitlement from the listener rather than the requestPurchase
+    // return value: this is the path that also fires for purchases Apple
+    // completes later (Ask to Buy, interrupted payments).
+    const sub = store.purchaseUpdatedListener(async (p) => {
+      try {
+        await store.finishTransaction({ purchase: p, isConsumable: false });
+      } catch {
+        // finishing is best-effort; the entitlement still stands
+      }
+      if (!cancelled) grant();
+    });
+
+    void (async () => {
+      try {
+        await store.initConnection();
+        const products = await store.fetchProducts({ skus: [PRODUCT_ID], type: "in-app" });
+        const first = (products ?? [])[0] as { displayPrice?: string } | undefined;
+        if (!cancelled && first?.displayPrice) setPriceLabel(first.displayPrice);
+      } catch {
+        // leave the price unknown; the paywall omits it rather than inventing one
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      sub?.remove?.();
+    };
+  }, [grant]);
 
   const purchase = useCallback(async (): Promise<PurchaseResult> => {
-    if (!PURCHASES_ENABLED) return "unavailable";
-    // Wired to expo-iap once the product is created in App Store Connect.
-    return "unavailable";
+    const store = iap();
+    if (!store) return "unavailable";
+    try {
+      await store.initConnection();
+      await store.requestPurchase({
+        request: { apple: { sku: PRODUCT_ID } },
+        type: "in-app",
+      });
+      // The grant happens in purchaseUpdatedListener below, which is the only
+      // path Apple guarantees fires for both fresh buys and deferred ones.
+      return "purchased";
+    } catch (e) {
+      const message = String((e as { message?: string })?.message ?? e);
+      // A user tapping "Cancel" is not an error worth alerting about.
+      if (/cancel/i.test(message)) return "cancelled";
+      return "failed";
+    }
   }, []);
 
   const restore = useCallback(async (): Promise<PurchaseResult> => {
-    if (!PURCHASES_ENABLED) return "unavailable";
-    return "unavailable";
-  }, []);
+    const store = iap();
+    if (!store) return "unavailable";
+    try {
+      await store.initConnection();
+      const owned = await store.getAvailablePurchases();
+      const found = (owned ?? []).some(
+        (p: { productId?: string; id?: string }) => (p.productId ?? p.id) === PRODUCT_ID
+      );
+      if (found) {
+        grant();
+        return "purchased";
+      }
+      return "failed";
+    } catch {
+      return "failed";
+    }
+  }, [grant]);
 
   const value = useMemo<EntitlementValue>(
     () => ({
@@ -120,9 +198,6 @@ export function EntitlementProvider({ children }: { children: React.ReactNode })
     }),
     [ready, state, priceLabel, noteExamTaken, purchase, restore]
   );
-
-  // `grant` is referenced by the purchase flow once PURCHASES_ENABLED flips.
-  void grant;
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
