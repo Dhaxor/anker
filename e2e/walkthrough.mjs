@@ -175,15 +175,34 @@ async function main() {
     record("EXAM", false, "could not open exam");
   }
 
-  // --- 5. Schwachstellen ---
+  // --- 5. Schwachstellen is Pro-gated. On a fresh install the correct
+  // behaviour is a redirect to the paywall, NOT the weak-spots screen.
+  // This check previously recorded a pass unconditionally, which is how it
+  // reported "weak-spots screen opened" while the app was showing the
+  // paywall — the exact false-pass this file's header warns about.
   if (await tap(driver, "~open-review", "Schwachstellen")) {
     await sleep(3000);
-    await shot(driver, "schwachstellen");
-    record("REVIEW", true, "weak-spots screen opened");
-    await tap(driver, "~review-back", "back", 6000);
+    const gatedToPaywall = await exists(driver, "~paywall-buy", 6000);
+    const showedWeakSpots = await exists(driver, "~review-back", 3000);
+    if (gatedToPaywall) {
+      await shot(driver, "paywall");
+      const restore = await exists(driver, "~paywall-restore", 4000);
+      record("PRO-GATE", true, "free user redirected to paywall as designed");
+      record("PAYWALL", restore, `buy=true restore=${restore}`);
+      await tap(driver, "~paywall-close", "close paywall", 6000);
+    } else if (showedWeakSpots) {
+      await shot(driver, "schwachstellen");
+      record("PRO-GATE", false, "weak spots reachable without Pro — gate is broken");
+      record("PAYWALL", false, "not reached: gate let us through");
+      await tap(driver, "~review-back", "back", 6000);
+    } else {
+      record("PRO-GATE", false, "neither paywall nor weak-spots after tapping Schwachstellen");
+      record("PAYWALL", false, "not reached");
+    }
     await sleep(2000);
   } else {
-    record("REVIEW", false, "could not open review");
+    record("PRO-GATE", false, "could not tap Schwachstellen");
+    record("PAYWALL", false, "not reached");
   }
 
   // --- 6. Settings, then the paywall. The paywall shot doubles as the
@@ -199,18 +218,12 @@ async function main() {
     const restoreRow = await exists(driver, "~settings-restore", 4000);
     record("RESTORE-VISIBLE", restoreRow, restoreRow ? "restore offered in settings" : "no restore row");
 
-    if (await tap(driver, "~settings-upgrade", "Anker Pro freischalten", 6000)) {
-      await sleep(3000);
-      await shot(driver, "paywall");
-      const buy = await exists(driver, "~paywall-buy", 6000);
-      const restore = await exists(driver, "~paywall-restore", 4000);
-      record("PAYWALL", buy && restore, `buy=${buy} restore=${restore}`);
-    } else {
-      record("PAYWALL", false, "could not open paywall from settings");
-    }
+    const upgradeRow = await exists(driver, "~settings-upgrade", 5000);
+    record("UPGRADE-ENTRY", upgradeRow, upgradeRow ? "paywall reachable from settings" : "no upgrade row");
   } else {
     record("PRIVACY-LINK", false, "could not open settings");
-    record("PAYWALL", false, "could not open settings");
+    record("RESTORE-VISIBLE", false, "could not open settings");
+    record("UPGRADE-ENTRY", false, "could not open settings");
   }
 
   const passed = results.filter((r) => r.pass).length;
