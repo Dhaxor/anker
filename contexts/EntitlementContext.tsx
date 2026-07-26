@@ -26,6 +26,12 @@ export type PurchaseResult = "purchased" | "cancelled" | "unavailable" | "failed
 interface EntitlementValue {
   ready: boolean;
   state: EntitlementState;
+  /**
+   * Localised price straight from the store (e.g. "4,99 €"), or null when the
+   * store has not answered yet. Never hardcode a price: App Store pricing is
+   * per-territory and Apple requires the real one be shown before purchase.
+   */
+  priceLabel: string | null;
   can: (feature: Feature) => boolean;
   examsLeft: number;
   noteExamTaken: () => void;
@@ -41,6 +47,7 @@ export function EntitlementProvider({ children }: { children: React.ReactNode })
   const [ready, setReady] = useState(false);
   const [pro, setPro] = useState(false);
   const [examsTaken, setExamsTaken] = useState(0);
+  const [priceLabel, setPriceLabel] = useState<string | null>(null);
 
   useEffect(() => {
     let stale = false;
@@ -76,6 +83,15 @@ export function EntitlementProvider({ children }: { children: React.ReactNode })
     void AsyncStorage.setItem(PRO_KEY, "1").catch(() => {});
   }, []);
 
+  // Fetch the localised price as soon as the store is reachable. Until the
+  // product exists this stays null and the paywall simply omits the price
+  // rather than showing an invented one.
+  useEffect(() => {
+    if (!PURCHASES_ENABLED) return;
+    // Wired to expo-iap getProducts() alongside purchase() below.
+    setPriceLabel(null);
+  }, []);
+
   const purchase = useCallback(async (): Promise<PurchaseResult> => {
     if (!PURCHASES_ENABLED) return "unavailable";
     // Wired to expo-iap once the product is created in App Store Connect.
@@ -91,6 +107,7 @@ export function EntitlementProvider({ children }: { children: React.ReactNode })
     () => ({
       ready,
       state,
+      priceLabel,
       can: (f: Feature) => canUse(f, state),
       examsLeft: examsRemaining(state),
       noteExamTaken,
@@ -101,7 +118,7 @@ export function EntitlementProvider({ children }: { children: React.ReactNode })
         void AsyncStorage.setItem(PRO_KEY, v ? "1" : "0").catch(() => {});
       },
     }),
-    [ready, state, noteExamTaken, purchase, restore]
+    [ready, state, priceLabel, noteExamTaken, purchase, restore]
   );
 
   // `grant` is referenced by the purchase flow once PURCHASES_ENABLED flips.

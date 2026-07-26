@@ -9,7 +9,8 @@ import React, {
   useState,
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Card, Grade, dueCards, newCard, review } from "@/lib/fsrs";
+import { Card, Grade, newCard, review } from "@/lib/fsrs";
+import { practiceQueue } from "@/lib/review";
 import { CardMap, Readiness, readiness } from "@/lib/readiness";
 import { Bundesland, Question, questionsFor } from "@/lib/questionBank";
 import { isoDay, streakFrom } from "@/lib/streak";
@@ -112,18 +113,8 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
   );
 
   const queue = useCallback(
-    (limit = 20): Question[] => {
-      if (!region) return [];
-      const now = Date.now();
-      const pool = questionsFor(region);
-      const withCards = pool
-        .filter((q) => cards[q.id])
-        .map((q) => ({ q, card: cards[q.id] as Card }));
-      const due = dueCards(withCards, now).map((x) => x.q);
-      // unseen questions fill the rest, in catalogue order so study feels ordered
-      const unseen = pool.filter((q) => !cards[q.id]);
-      return [...due, ...unseen].slice(0, limit);
-    },
+    (limit = 20): Question[] =>
+      region ? practiceQueue(cards, region, Date.now(), limit) : [],
     [cards, region]
   );
 

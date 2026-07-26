@@ -40,7 +40,7 @@ export default function PaywallScreen() {
   const insets = useSafeAreaInsets();
   const c = useTheme();
   const s = useMemo(() => styles(c), [c]);
-  const { purchase, restore } = useEntitlement();
+  const { purchase, restore, priceLabel } = useEntitlement();
   const [busy, setBusy] = useState(false);
 
   const run = async (fn: () => Promise<string>, failMessage: string) => {
@@ -129,7 +129,9 @@ export default function PaywallScreen() {
           {busy ? (
             <ActivityIndicator color={c.onPrimary} />
           ) : (
-            <Text style={s.primaryText}>Anker Pro freischalten</Text>
+            <Text style={s.primaryText}>
+              {priceLabel ? `Anker Pro freischalten · ${priceLabel}` : "Anker Pro freischalten"}
+            </Text>
           )}
         </TouchableOpacity>
         <TouchableOpacity

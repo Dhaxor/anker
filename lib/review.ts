@@ -4,7 +4,7 @@
 // questions that are actually going to cost points — not on a tidy sweep of the
 // catalogue. These selectors are pure so the ordering is testable.
 
-import { Card, retrievability } from "./fsrs";
+import { Card, dueCards, retrievability } from "./fsrs";
 import { CardMap, pCorrect } from "./readiness";
 import { Bundesland, Question, questionsFor } from "./questionBank";
 
@@ -88,4 +88,29 @@ export function mastered(cards: CardMap, region: Bundesland, now: number): numbe
     const c = cards[q.id];
     return c ? retrievability(c, now) >= 0.9 : false;
   }).length;
+}
+
+/**
+ * The practice queue: everything due now (weakest recall first), then unseen
+ * questions in catalogue order so a study session feels ordered rather than
+ * random.
+ *
+ * Pure and time-injected so the cold-start and all-mastered cases can be
+ * tested. This logic previously lived inside a React callback, where a bug —
+ * building the queue before AsyncStorage had loaded — showed "nothing to
+ * review" to users with 310 unseen questions.
+ */
+export function practiceQueue(
+  cards: CardMap,
+  region: Bundesland,
+  now: number,
+  limit = 20
+): Question[] {
+  const pool = questionsFor(region);
+  const withCards = pool
+    .filter((q) => cards[q.id])
+    .map((q) => ({ q, card: cards[q.id] as Card }));
+  const due = dueCards(withCards, now).map((x) => x.q);
+  const fresh = pool.filter((q) => !cards[q.id]);
+  return [...due, ...fresh].slice(0, limit);
 }
