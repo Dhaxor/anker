@@ -13,10 +13,6 @@
       "config": {
         "usesNonExemptEncryption": false
       },
-      "infoPlist": {
-        "NSMicrophoneUsageDescription": "Anker h�rt mit, w�hrend Sie deutsche S�tze laut �ben, um Ihnen R�ckmeldung zu geben.",
-        "NSSpeechRecognitionUsageDescription": "Die Spracherkennung l�uft auf Ihrem Ger�t und pr�ft die S�tze, die Sie laut �ben."
-      },
       "icon": "./assets/icon.png"
     },
     "android": {
@@ -41,8 +37,7 @@
     "scheme": "curo",
     "newArchEnabled": true,
     "plugins": [
-      "expo-router",
-      "expo-audio"
+      "expo-router"
     ],
     "experiments": {
       "typedRoutes": true

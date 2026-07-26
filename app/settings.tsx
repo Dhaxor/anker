@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Linking } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { ChevronLeft, Check, MapPin, RotateCcw, Anchor, FileText } from "lucide-react-native";
+import { ChevronLeft, Check, MapPin, RotateCcw, Anchor, FileText, Shield } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import Constants from "expo-constants";
 import { useProgress } from "@/contexts/ProgressContext";
@@ -13,6 +13,7 @@ import { space, type, radius, MIN_TAP, type ThemeColors } from "@/constants/them
 
 const CATALOGUE_URL =
   "https://www.bamf.de/SharedDocs/Anlagen/DE/Integration/Einbuergerung/gesamtfragenkatalog-lebenindeutschland.pdf";
+const PRIVACY_URL = "https://dhaxor.github.io/anker/datenschutz.html";
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -154,6 +155,21 @@ export default function SettingsScreen() {
           Wort mit dem amtlichen Dokument abgeglichen; die übrigen sind Bildfragen oder konnten
           nicht automatisch geprüft werden und sind in der Übung entsprechend gekennzeichnet. Anker
           ist keine amtliche App des BAMF.
+        </Text>
+
+        <Text style={[s.sectionLabel, { marginTop: space.lg }]}>Rechtliches</Text>
+        <TouchableOpacity
+          style={s.row}
+          testID="settings-privacy"
+          activeOpacity={0.7}
+          onPress={() => void Linking.openURL(PRIVACY_URL)}
+        >
+          <Shield size={18} color={c.primary} />
+          <Text style={s.rowLabel}>Datenschutz</Text>
+          <Text style={s.rowAction}>Öffnen</Text>
+        </TouchableOpacity>
+        <Text style={s.hint}>
+          Anker erhebt keine Daten. Ihr Fortschritt bleibt auf diesem Gerät.
         </Text>
 
         <Text style={[s.sectionLabel, { marginTop: space.lg }]}>Fortschritt</Text>
