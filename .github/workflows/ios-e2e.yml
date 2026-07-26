@@ -12,7 +12,7 @@ jobs:
     runs-on: macos-14
     env:
       BUNDLE_ID: app.anker.einbuergerung
-      APP_URL: "https://expo.dev/artifacts/eas/DvRrsBPiu553gZZDK_u71JlRYJ8AmBqZPve7-NlVjF0.tar.gz"
+      APP_URL: "https://expo.dev/artifacts/eas/J1lbNyo20J6A-zDwgHwlsqCa1oKcSwEt6kolGI2KAfY.tar.gz"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
