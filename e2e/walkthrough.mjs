@@ -77,9 +77,6 @@ const caps = {
   // produced a run with no walkthrough at all. Give it real headroom.
   "appium:wdaLaunchTimeout": 600000,
   "appium:wdaConnectionTimeout": 600000,
-  // Reuse the agent between attempts rather than tearing it down and paying
-  // the build cost again on every retry.
-  "appium:usePrebuiltWDA": true,
   "appium:shouldTerminateApp": true,
 };
 
@@ -95,9 +92,10 @@ async function connect() {
         capabilities: caps,
       });
     } catch (e) {
-      log(`session attempt ${attempt}/3 failed:`, (e.message || "").split("\n")[0]);
-      if (attempt === 3) throw e;
-      await sleep(10000);
+      log(`session attempt ${attempt}/4 failed:`, (e.message || "").split("\n")[0]);
+      if (attempt === 4) throw e;
+      // WDA may still be building; give it time rather than hammering.
+      await sleep(45000);
     }
   }
 }
