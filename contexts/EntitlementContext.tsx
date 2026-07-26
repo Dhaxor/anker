@@ -15,12 +15,18 @@ import React, {
 import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { EntitlementState, canUse, examsRemaining, type Feature } from "@/lib/entitlement";
+import {
+  PRODUCT_ID,
+  classifyPurchaseError,
+  ownsProduct,
+  displayablePrice,
+} from "@/lib/purchase";
 
 const PRO_KEY = "anker.pro.v1";
 const EXAMS_KEY = "anker.examsTaken.v1";
 
-/** The non-consumable unlock, created in App Store Connect (IAP 6794763803). */
-export const PRODUCT_ID = "app.anker.einbuergerung.pro";
+/** Re-exported so screens keep a single import site. IAP 6794763803. */
+export { PRODUCT_ID };
 
 /**
  * Purchases run on iOS only. On web (our verification harness) the store
@@ -129,8 +135,8 @@ export function EntitlementProvider({ children }: { children: React.ReactNode })
       try {
         await store.initConnection();
         const products = await store.fetchProducts({ skus: [PRODUCT_ID], type: "in-app" });
-        const first = (products ?? [])[0] as { displayPrice?: string } | undefined;
-        if (!cancelled && first?.displayPrice) setPriceLabel(first.displayPrice);
+        const price = displayablePrice((products ?? [])[0] as never);
+        if (!cancelled && price) setPriceLabel(price);
       } catch {
         // leave the price unknown; the paywall omits it rather than inventing one
       }
@@ -155,10 +161,8 @@ export function EntitlementProvider({ children }: { children: React.ReactNode })
       // path Apple guarantees fires for both fresh buys and deferred ones.
       return "purchased";
     } catch (e) {
-      const message = String((e as { message?: string })?.message ?? e);
-      // A user tapping "Cancel" is not an error worth alerting about.
-      if (/cancel/i.test(message)) return "cancelled";
-      return "failed";
+      // A user changing their mind is not an error worth alerting about.
+      return classifyPurchaseError(e);
     }
   }, []);
 
@@ -168,10 +172,7 @@ export function EntitlementProvider({ children }: { children: React.ReactNode })
     try {
       await store.initConnection();
       const owned = await store.getAvailablePurchases();
-      const found = (owned ?? []).some(
-        (p: { productId?: string; id?: string }) => (p.productId ?? p.id) === PRODUCT_ID
-      );
-      if (found) {
+      if (ownsProduct(owned as never)) {
         grant();
         return "purchased";
       }
