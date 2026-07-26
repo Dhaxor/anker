@@ -164,7 +164,7 @@ async function main() {
     await tap(driver, "~exam-exit", "leave exam");
     await sleep(1200);
     // A confirmation alert guards leaving a started exam.
-    await tap(driver, byContains("Verlassen"), "confirm leave", 4000);
+    await tap(driver, byContains("Beenden"), "confirm leave exam", 6000);
     await sleep(2500);
   } else {
     record("EXAM", false, "could not open exam");

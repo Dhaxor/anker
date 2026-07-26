@@ -203,9 +203,13 @@ export default function ExamScreen() {
           testID="exam-exit"
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           onPress={() =>
-            Alert.alert("Prüfung abbrechen?", "Ihr Ergebnis wird nicht gespeichert.", [
-              { text: "Weiter üben", style: "cancel" },
-              { text: "Abbrechen", style: "destructive", onPress: () => router.back() },
+            // Button wording matters here: "Abbrechen" is what iOS German uses
+            // to DISMISS a dialog, so labelling the destructive action that way
+            // makes the safe-looking tap the one that destroys a 60-minute
+            // exam. Both buttons now say what they do.
+            Alert.alert("Prüfung beenden?", "Ihr Ergebnis wird nicht gespeichert.", [
+              { text: "Fortsetzen", style: "cancel" },
+              { text: "Beenden", style: "destructive", onPress: () => router.back() },
             ])
           }
         >
