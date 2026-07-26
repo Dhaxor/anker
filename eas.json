@@ -11,8 +11,12 @@
     "preview": {
       "distribution": "internal",
       "channel": "preview",
-      "ios": { "simulator": true },
-      "android": { "buildType": "apk" }
+      "ios": {
+        "simulator": true
+      },
+      "android": {
+        "buildType": "apk"
+      }
     },
     "production": {
       "channel": "production",
@@ -21,14 +25,18 @@
     "devicetest": {
       "distribution": "internal",
       "environment": "production",
-      "ios": { "simulator": true },
-      "android": { "buildType": "apk" }
+      "ios": {
+        "simulator": true
+      },
+      "android": {
+        "buildType": "apk"
+      }
     }
   },
   "submit": {
     "production": {
       "ios": {
-        "ascAppId": "REPLACE_AFTER_APP_RECORD_IS_CREATED",
+        "ascAppId": "6794756607",
         "ascApiKeyPath": "./credentials/AuthKey.p8",
         "ascApiKeyId": "27A6X9P27C",
         "ascApiKeyIssuerId": "884ed5da-6ca7-44a8-8935-44e24dea4649"

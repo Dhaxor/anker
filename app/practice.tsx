@@ -132,11 +132,20 @@ export default function PracticeScreen() {
         contentContainerStyle={[s.content, { paddingBottom: insets.bottom + 120 }]}
         showsVerticalScrollIndicator={false}
       >
-        {q.region !== "Allgemein" && <Text style={s.regionTag}>{q.region}</Text>}
-        <Text style={s.question} testID="question-text">
-          {q.question}
-        </Text>
+        {/* The question sits centred in the space above the options rather than
+            pinned to the top, so a one-line question does not leave a void. */}
+        <View style={s.questionBlock}>
+          {q.region !== "Allgemein" && <Text style={s.regionTag}>{q.region}</Text>}
+          <Text style={s.question} testID="question-text">
+            {q.question}
+          </Text>
+        </View>
 
+        {/* Options are bottom-anchored (marginTop:auto inside a flexGrow
+            container): with a short question they land in the thumb zone
+            instead of stranding every tap target in the top half of a 6.7"
+            screen. A long question simply pushes them back up and scrolls. */}
+        <View style={s.options}>
         {q.options.map((opt, i) => {
           const isCorrect = i === q.correct;
           const isPicked = i === picked;
@@ -168,6 +177,7 @@ export default function PracticeScreen() {
             </TouchableOpacity>
           );
         })}
+        </View>
 
         {answered && !q.verifiedAgainstOfficialCatalogue && (
           <Text style={s.note} testID="provenance-note">
@@ -211,7 +221,9 @@ const styles = (c: ThemeColors) =>
     progressFill: { height: 6, borderRadius: radius.pill, backgroundColor: c.primary },
     counter: { ...type.caption, color: c.textMuted, fontVariant: ["tabular-nums"] },
 
-    content: { paddingHorizontal: space.lg, paddingTop: space.base },
+    content: { paddingHorizontal: space.lg, paddingTop: space.base, flexGrow: 1 },
+    questionBlock: { flex: 1, justifyContent: "center", paddingBottom: space.lg },
+    options: { marginTop: "auto" },
     regionTag: { ...type.caption, color: c.primary, marginBottom: space.sm },
     question: { ...type.title, color: c.text, marginBottom: space.lg, lineHeight: 28 },
 
