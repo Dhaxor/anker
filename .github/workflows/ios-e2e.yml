@@ -10,6 +10,7 @@ permissions:
 jobs:
   walkthrough:
     runs-on: macos-14
+    timeout-minutes: 60
     env:
       BUNDLE_ID: app.anker.einbuergerung
       APP_URL: "https://expo.dev/artifacts/eas/J1lbNyo20J6A-zDwgHwlsqCa1oKcSwEt6kolGI2KAfY.tar.gz"

@@ -72,13 +72,20 @@ const caps = {
   "appium:udid": UDID,
   "appium:bundleId": BUNDLE,
   "appium:newCommandTimeout": 300,
-  "appium:wdaLaunchTimeout": 240000,
-  "appium:wdaConnectionTimeout": 240000,
+  // A cold WebDriverAgent build on a GitHub macOS runner has been measured at
+  // 311s — the previous 240s ceiling made every session attempt time out and
+  // produced a run with no walkthrough at all. Give it real headroom.
+  "appium:wdaLaunchTimeout": 600000,
+  "appium:wdaConnectionTimeout": 600000,
+  // Reuse the agent between attempts rather than tearing it down and paying
+  // the build cost again on every retry.
+  "appium:usePrebuiltWDA": true,
+  "appium:shouldTerminateApp": true,
 };
 
 async function connect() {
   // Cold WDA start intermittently times out; retry rather than fail the run.
-  for (let attempt = 1; attempt <= 3; attempt++) {
+  for (let attempt = 1; attempt <= 4; attempt++) {
     try {
       return await remote({
         hostname: "127.0.0.1",
