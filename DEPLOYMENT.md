@@ -14,39 +14,48 @@ need your Apple/GitHub credentials, and exactly what I run afterwards.
 | EAS project | `@dhaxor/anker-einbuergerungstest` (`dad0750c-7e7d-41ef-897f-5f5e572d9ca9`) |
 | Version | 1.0.0 (build 1) |
 | Native build | ✅ green — `b2d80904-6737-4ead-b050-6e41b3370589`, iOS simulator, SDK 57 |
-| Tests | 100 passing, `tsc --noEmit` clean |
-| Store listing | written + validated (`store/localizations/de-DE.strings`) |
+| Tests | 121 passing, `tsc --noEmit` clean |
+| Store listing | ✅ **pushed live** — name, subtitle, description, keywords, whatsNew, URLs |
+| Screenshots | ✅ **6 uploaded** at APP_IPHONE_67, all COMPLETE |
+| Categories | ✅ EDUCATION / REFERENCE, app free |
+| Age rating | ✅ all NONE/false (no Kids Category) |
+| Privacy + Support URL | ✅ live at dhaxor.github.io/anker (both 200) |
 | Icon / splash | generated (`python scripts/make_icon.py`) |
-| Purchases | built, **disabled** until the product exists (`PURCHASES_ENABLED` in `contexts/EntitlementContext.tsx`) |
+| IAP | ✅ **READY_TO_SUBMIT** — `app.anker.einbuergerung.pro`, EUR 4.99, 34 territories |
+| Purchases | ✅ wired via expo-iap, granted from the listener path |
 
 ---
 
-## Step 1 — create the App Store record (you)
+## Step 1 — one interactive build (you, ~2 minutes)
 
-Apple's public API cannot create apps; it needs an Apple ID web session with your
-password and 2FA, which I do not handle. Two minutes in App Store Connect:
+Everything else is done. The only blocker is iOS signing credentials for this
+new bundle ID.
 
-1. **My Apps → + → New App**
-2. Platform **iOS**
-3. Name **`Anker: Einbürgerungstest`**
-4. Primary language **German (Germany)**
-5. Bundle ID **`app.anker.einbuergerung`** — if it is not in the dropdown, register it
-   first at [Certificates, Identifiers & Profiles](https://developer.apple.com/account/resources/identifiers/list)
-6. SKU: anything unique, e.g. `ANKER-EBT-001`
+Exactly one iOS distribution certificate exists on the account
+(`LT2N4R9A5S`, "iOS Distribution: Gain Ovuta", valid to 2027-03-12) — created
+for Scripture Mate, with its private key held on Expo's servers. EAS can reuse
+it for Anker, but only via an interactive prompt; `--non-interactive` fails with
+"Distribution Certificate is not validated for non-interactive builds".
 
-Then send me the **Apple ID number** shown on the app's page (a 10-digit number).
+The App Store provisioning profile already exists — I created it through the
+API (`3ZYG9QPVPF`, bundle resource `DPTW5QKP4U`), so EAS only needs to be
+pointed at the certificate.
 
-## Step 2 — push the repo to GitHub (you)
-
-The free iOS screenshot harness runs on GitHub Actions macOS runners, so the repo
-needs a remote. Any private repo works:
+Run this once, in a terminal:
 
 ```bash
-git -C "Downloads/solve_problem/anker" remote add origin https://github.com/<you>/anker.git
-git -C "Downloads/solve_problem/anker" push -u origin HEAD
+cd Downloads/solve_problem/anker && npx eas-cli@latest build --platform ios --profile production
 ```
 
----
+When it asks about credentials, choose to **reuse the existing distribution
+certificate**. After that first run, every future build works non-interactively
+and I can drive the whole pipeline again.
+
+> Deliberately not automated: the alternative is minting a *second*
+> distribution certificate and keeping its private key as a .p12 on disk.
+> Apple allows individual accounts only two, so that burns a scarce
+> account-level slot and leaves a sensitive key file around — a poor trade
+> against a two-minute prompt.
 
 ## Step 3 — everything after that is mine
 
