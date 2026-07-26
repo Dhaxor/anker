@@ -11,8 +11,8 @@ jobs:
   walkthrough:
     runs-on: macos-14
     env:
-      BUNDLE_ID: app.rork.ai-bible-explorer
-      APP_URL: "https://expo.dev/artifacts/eas/XTTbkPQ_rFyFOkZiGYFeoPxdRaXfAHcfn052gsXOfPw.tar.gz"
+      BUNDLE_ID: app.anker.einbuergerung
+      APP_URL: "https://expo.dev/artifacts/eas/DvRrsBPiu553gZZDK_u71JlRYJ8AmBqZPve7-NlVjF0.tar.gz"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -82,7 +82,7 @@ jobs:
           cp shots/*.log /tmp/results/ 2>/dev/null || true
           cp appium.log /tmp/results/appium.log 2>/dev/null || true
           echo "iOS E2E run $(date -u)" > /tmp/results/RUN.txt
-          git config user.email "ci@scripturemate"; git config user.name "ios-e2e"
+          git config user.email "ci@anker"; git config user.name "ios-e2e"
           # Orphan branch, then wipe ALL working files (node_modules/app/etc) so only results are committed
           git checkout --orphan e2e-results
           git rm -rf --cached . >/dev/null 2>&1 || true
