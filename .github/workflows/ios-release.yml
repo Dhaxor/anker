@@ -29,12 +29,6 @@ jobs:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
       EAS_SKIP_AUTO_FINGERPRINT: "1"
       EAS_BUILD_NO_EXPO_GO_WARNING: "true"
-      # Keep the build directory after a failure. By default eas build --local
-      # works in a temp dir and deletes it when it exits, taking the raw
-      # xcodebuild logs with it — which is why the first attempt to collect
-      # them found nothing.
-      EAS_LOCAL_BUILD_WORKINGDIR: ${{ runner.temp }}/easbuild
-      EAS_LOCAL_BUILD_SKIP_CLEANUP: "1"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -56,6 +50,14 @@ jobs:
           npx tsc --noEmit
 
       - name: Build signed IPA
+        env:
+          # Keep the build tree after a failure. By default eas build --local
+          # works in a temp dir and deletes it on exit, taking the raw
+          # xcodebuild logs with it — which is why the first attempt to
+          # collect them found nothing. These belong on the step, not the job:
+          # the `runner` context does not resolve in job-level env.
+          EAS_LOCAL_BUILD_WORKINGDIR: ${{ runner.temp }}/easbuild
+          EAS_LOCAL_BUILD_SKIP_CLEANUP: "1"
         run: |
           npx eas-cli@latest build \
             --platform ios \
