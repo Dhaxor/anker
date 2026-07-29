@@ -58,6 +58,28 @@ jobs:
             --non-interactive \
             --output "$RUNNER_TEMP/anker.ipa"
 
+      - name: Collect Xcode logs on failure
+        if: failure()
+        # EAS local builds run gym with suppress_xcode_output, writing the real
+        # compiler output to a temp dir instead of the job log. Without this a
+        # failing script phase surfaces only as "Exit status: 65" and fastlane's
+        # error scanner guesses badly at the cause.
+        run: |
+          mkdir -p "$RUNNER_TEMP/xcodelogs"
+          find "${TMPDIR:-/tmp}" -path '*eas-build-local-nodejs*/logs/*' -type f \
+            -exec cp {} "$RUNNER_TEMP/xcodelogs/" \; 2>/dev/null || true
+          find "${TMPDIR:-/tmp}" -name '*.xcresult' -maxdepth 2 -print 2>/dev/null || true
+          ls -la "$RUNNER_TEMP/xcodelogs" || true
+
+      - name: Upload Xcode logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcode-build-logs
+          path: ${{ runner.temp }}/xcodelogs
+          retention-days: 7
+          if-no-files-found: warn
+
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
         with:
