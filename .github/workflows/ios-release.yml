@@ -29,6 +29,12 @@ jobs:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
       EAS_SKIP_AUTO_FINGERPRINT: "1"
       EAS_BUILD_NO_EXPO_GO_WARNING: "true"
+      # Keep the build directory after a failure. By default eas build --local
+      # works in a temp dir and deletes it when it exits, taking the raw
+      # xcodebuild logs with it — which is why the first attempt to collect
+      # them found nothing.
+      EAS_LOCAL_BUILD_WORKINGDIR: ${{ runner.temp }}/easbuild
+      EAS_LOCAL_BUILD_SKIP_CLEANUP: "1"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -66,9 +72,12 @@ jobs:
         # error scanner guesses badly at the cause.
         run: |
           mkdir -p "$RUNNER_TEMP/xcodelogs"
-          find "${TMPDIR:-/tmp}" -path '*eas-build-local-nodejs*/logs/*' -type f \
-            -exec cp {} "$RUNNER_TEMP/xcodelogs/" \; 2>/dev/null || true
-          find "${TMPDIR:-/tmp}" -name '*.xcresult' -maxdepth 2 -print 2>/dev/null || true
+          for root in "$RUNNER_TEMP/easbuild" "${TMPDIR:-/tmp}"; do
+            [ -d "$root" ] || continue
+            find "$root" \( -name '*.log' -o -path '*/logs/*' \) -type f -size -20M \
+              -exec cp {} "$RUNNER_TEMP/xcodelogs/" \; 2>/dev/null || true
+          done
+          echo "collected:"
           ls -la "$RUNNER_TEMP/xcodelogs" || true
 
       - name: Upload Xcode logs
@@ -78,7 +87,9 @@ jobs:
           name: xcode-build-logs
           path: ${{ runner.temp }}/xcodelogs
           retention-days: 7
-          if-no-files-found: warn
+          # error, not warn: a silent empty artifact is what made the previous
+          # failure undiagnosable.
+          if-no-files-found: error
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
