@@ -23,7 +23,11 @@ on:
 
 jobs:
   build:
-    runs-on: macos-15
+    # macos-26 for Xcode 26. macos-15 ships Xcode 16.4 / Swift tools 6.1, and
+    # expo-modules-jsi pulls a package requiring Swift tools 6.2 — its
+    # xcframework script phase fails the archive. Apple also rejects uploads
+    # not built against the iOS 26 SDK (ITMS-90725).
+    runs-on: macos-26
     timeout-minutes: 90
     env:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
@@ -32,6 +36,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Verify Xcode is new enough
+        run: |
+          xcodebuild -version
+          MAJOR=$(xcodebuild -version | head -1 | sed -E 's/Xcode ([0-9]+).*/\1/')
+          if [ "$MAJOR" -lt 26 ]; then
+            echo "::error::Xcode $MAJOR too old; need 26+ for Swift tools 6.2 and the iOS 26 SDK."
+            exit 1
+          fi
 
       - name: Setup Node
         uses: actions/setup-node@v4
