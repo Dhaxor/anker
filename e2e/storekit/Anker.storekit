@@ -1,0 +1,38 @@
+{
+  "identifier" : "ANKERSTOREKITTEST",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "4.99",
+      "familyShareable" : false,
+      "internalID" : "ANKERPRO0001",
+      "localizations" : [
+        {
+          "description" : "Alle Pro-Werkzeuge dauerhaft freischalten",
+          "displayName" : "Anker Pro",
+          "locale" : "de_DE"
+        },
+        {
+          "description" : "Unlock every Pro tool permanently",
+          "displayName" : "Anker Pro",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "app.anker.einbuergerung.pro",
+      "referenceName" : "Anker Pro",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : {
+
+  },
+  "subscriptionGroups" : [
+
+  ],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}

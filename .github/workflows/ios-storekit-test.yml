@@ -1,0 +1,89 @@
+name: iOS StoreKit purchase round trip
+
+# Completes a purchase through the REAL native StoreKit machinery against
+# Apple's local test store (StoreKit Testing) and asserts:
+#
+#   paywall → buy → transaction completes → purchaseUpdatedListener grants
+#   Pro → weak-spots unlocks → entitlement survives a cold relaunch
+#
+# This is the hop the Appium purchase E2E cannot reach without a sandbox
+# Apple Account. No account or credentials are involved: the test store is
+# local to the simulator.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  storekit-roundtrip:
+    runs-on: macos-26
+    timeout-minutes: 90
+    env:
+      CI: "1"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify Xcode is new enough
+        run: |
+          xcodebuild -version
+          MAJOR=$(xcodebuild -version | head -1 | sed -E 's/Xcode ([0-9]+).*/\1/')
+          if [ "$MAJOR" -lt 26 ]; then
+            echo "::error::Xcode $MAJOR too old; SDK 57 needs Swift tools 6.2 (Xcode 26+)."
+            exit 1
+          fi
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: npm ci --include=dev
+
+      - name: Prebuild the iOS project
+        run: npx expo prebuild --platform ios
+
+      - name: Inject the StoreKit UI-test target
+        run: |
+          ruby -e "require 'xcodeproj'" 2>/dev/null || sudo gem install xcodeproj --no-document
+          ruby scripts/add_storekit_uitest.rb
+
+      - name: Run the purchase round trip
+        run: |
+          LINE=$(xcrun simctl list devices available | grep -iE 'iPhone .*Pro' | head -1)
+          [ -z "$LINE" ] && LINE=$(xcrun simctl list devices available | grep -i 'iPhone' | head -1)
+          UDID=$(echo "$LINE" | grep -oiE '[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}')
+          test -n "$UDID"
+          xcrun simctl boot "$UDID" || true
+          xcrun simctl bootstatus "$UDID" -b
+          set -o pipefail
+          xcodebuild test \
+            -workspace ios/Anker.xcworkspace \
+            -scheme AnkerUITests \
+            -configuration Release \
+            -destination "platform=iOS Simulator,id=$UDID" \
+            -resultBundlePath "$RUNNER_TEMP/storekit.xcresult" \
+            -derivedDataPath "$RUNNER_TEMP/dd" \
+            CODE_SIGNING_ALLOWED=NO \
+            2>&1 | tee xcodebuild.log | { grep -E "Test Case|Test Suite|error:|BUILD|passed|failed" || true; }
+          # pipefail makes the pipeline report xcodebuild's own exit code; the
+          # grep is display-only and shielded so an empty match cannot mask it.
+          tail -5 xcodebuild.log
+
+      - name: Package result bundle
+        if: always()
+        run: |
+          [ -d "$RUNNER_TEMP/storekit.xcresult" ] && ditto -c -k --sequesterRsrc "$RUNNER_TEMP/storekit.xcresult" storekit-xcresult.zip || true
+          ls -la storekit-xcresult.zip 2>/dev/null || echo "no xcresult produced"
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: storekit-roundtrip-results
+          path: |
+            xcodebuild.log
+            storekit-xcresult.zip
+          retention-days: 14
+          if-no-files-found: error
