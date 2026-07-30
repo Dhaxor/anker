@@ -66,6 +66,40 @@ async function textOf(driver, selector) {
   }
 }
 
+/**
+ * Clear whatever native sheet is up — App Store sign-in prompts and RN alerts
+ * are both UIAlertController-family surfaces. Returns how many were closed.
+ */
+async function dismissSheets(driver) {
+  let closed = 0;
+  for (let round = 0; round < 4; round++) {
+    try {
+      const text = await driver.getAlertText();
+      if (text) {
+        log("alert:", String(text).split("\n")[0]);
+        await driver.dismissAlert().catch(() => driver.acceptAlert().catch(() => {}));
+        closed++;
+        await sleep(1200);
+        continue;
+      }
+    } catch {
+      // no alert in the classic sense; fall through to button labels
+    }
+    let tapped = false;
+    // German first (app alerts), then English (simulator system sheets).
+    for (const label of ["Abbrechen", "Cancel", "Not Now", "Nicht jetzt", "OK"]) {
+      if (await tap(driver, byContains(label), `dismiss "${label}"`, 1500)) {
+        closed++;
+        tapped = true;
+        await sleep(1200);
+        break;
+      }
+    }
+    if (!tapped) break;
+  }
+  return closed;
+}
+
 const caps = {
   platformName: "iOS",
   "appium:automationName": "XCUITest",
@@ -189,6 +223,67 @@ async function main() {
       const restore = await exists(driver, "~paywall-restore", 4000);
       record("PRO-GATE", true, "free user redirected to paywall as designed");
       record("PAYWALL", restore, `buy=true restore=${restore}`);
+
+      // --- 5a. Purchase flow, as far as it goes without a sandbox account. ---
+      // The buy label carries the price ONLY when the real App Store Connect
+      // product came back from Apple's servers (priceLabel is never invented,
+      // see EntitlementContext) — so a visible price proves product ID, bundle
+      // linkage and agreements end to end.
+      const buyLabel = await textOf(driver, "~paywall-buy");
+      const priceShown = !!buyLabel && /·.*\d/.test(buyLabel);
+      record("STORE-PRODUCT", priceShown, `buy label: ${JSON.stringify(buyLabel)}`);
+
+      // Attempt the purchase. Without a signed-in account this must end in a
+      // sheet or a graceful failure — never a crash, never an unlock.
+      await tap(driver, "~paywall-buy", "attempt purchase");
+      await sleep(12000);
+      await shot(driver, "purchase-attempt");
+      const closedSheets = await dismissSheets(driver);
+      const responsive =
+        (await exists(driver, "~paywall-buy", 8000)) ||
+        (await exists(driver, "~paywall-close", 4000));
+      record(
+        "BUY-ATTEMPT",
+        responsive,
+        `sheets closed=${closedSheets}; app responsive after attempt=${responsive}`
+      );
+
+      // The gate must still be shut: a failed/cancelled purchase that unlocks
+      // Pro is the classic IAP grant bug.
+      await tap(driver, "~paywall-close", "close paywall", 6000);
+      await sleep(2000);
+      await tap(driver, "~open-review", "Schwachstellen again");
+      await sleep(3000);
+      const stillGated = await exists(driver, "~paywall-buy", 8000);
+      record(
+        "NO-FALSE-GRANT",
+        stillGated,
+        stillGated
+          ? "failed purchase attempt did not unlock Pro"
+          : "GATE OPEN after failed purchase — grant bug"
+      );
+
+      // Restore with nothing owned must also not unlock.
+      if (stillGated) {
+        await tap(driver, "~paywall-restore", "restore with nothing owned");
+        await sleep(10000);
+        await shot(driver, "restore-attempt");
+        await dismissSheets(driver); // the "Fehlgeschlagen" alert
+        await tap(driver, "~paywall-close", "close paywall", 6000);
+        await sleep(2000);
+        await tap(driver, "~open-review", "Schwachstellen after restore");
+        await sleep(3000);
+        const gatedAfterRestore = await exists(driver, "~paywall-buy", 8000);
+        record(
+          "RESTORE-NO-GRANT",
+          gatedAfterRestore,
+          gatedAfterRestore
+            ? "empty restore did not unlock Pro"
+            : "GATE OPEN after empty restore"
+        );
+      } else {
+        record("RESTORE-NO-GRANT", false, "skipped: gate already open");
+      }
       await tap(driver, "~paywall-close", "close paywall", 6000);
     } else if (showedWeakSpots) {
       await shot(driver, "schwachstellen");

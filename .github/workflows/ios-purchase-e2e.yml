@@ -1,0 +1,118 @@
+name: iOS purchase-flow E2E (simulator)
+
+# Everything a sandbox purchase test proves, short of the payment itself,
+# on a free GitHub simulator — no device, no sandbox account:
+#
+#   STORE-PRODUCT    the real ASC product loads from Apple's servers
+#                    (the buy label only carries a price when it does)
+#   BUY-ATTEMPT      requestPurchase reaches StoreKit and fails gracefully
+#                    with no signed-in account — no crash
+#   NO-FALSE-GRANT   a failed purchase does NOT unlock Pro
+#   RESTORE-NO-GRANT an empty restore does NOT unlock Pro
+#
+# The one hop this cannot cover — a completed payment delivering the grant —
+# is unit-tested in lib/purchase.test.ts (listener grant, revocationDate
+# rejection) and is exercised for real by App Review itself.
+#
+# Builds the devicetest (simulator + production env) app locally on the
+# runner: public repo, unlimited minutes, no EAS quota.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  purchase-e2e:
+    runs-on: macos-26
+    timeout-minutes: 90
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      EAS_SKIP_AUTO_FINGERPRINT: "1"
+      EAS_BUILD_NO_EXPO_GO_WARNING: "true"
+      BUNDLE_ID: app.anker.einbuergerung
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify Xcode is new enough
+        run: |
+          xcodebuild -version
+          MAJOR=$(xcodebuild -version | head -1 | sed -E 's/Xcode ([0-9]+).*/\1/')
+          if [ "$MAJOR" -lt 26 ]; then
+            echo "::error::Xcode $MAJOR too old; SDK 57 needs Swift tools 6.2 (Xcode 26+)."
+            exit 1
+          fi
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Verify the lockfile matches package.json
+        run: npm ci --include=dev
+
+      - name: Build simulator app (local — no EAS quota)
+        env:
+          EAS_LOCAL_BUILD_WORKINGDIR: ${{ runner.temp }}/easbuild
+          EAS_LOCAL_BUILD_SKIP_CLEANUP: "1"
+        run: |
+          npx eas-cli@latest build \
+            --platform ios \
+            --profile devicetest \
+            --local \
+            --non-interactive \
+            --output "$RUNNER_TEMP/anker-sim.tar.gz"
+
+      - name: Collect Xcode logs on failure
+        if: failure()
+        run: |
+          mkdir -p "$RUNNER_TEMP/xcodelogs"
+          for root in "$RUNNER_TEMP/easbuild" "${TMPDIR:-/tmp}"; do
+            [ -d "$root" ] || continue
+            find "$root" \( -name '*.log' -o -path '*/logs/*' \) -type f -size -20M \
+              -exec cp {} "$RUNNER_TEMP/xcodelogs/" \; 2>/dev/null || true
+          done
+          ls -la "$RUNNER_TEMP/xcodelogs" || true
+
+      - name: Upload Xcode logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcode-build-logs
+          path: ${{ runner.temp }}/xcodelogs
+          retention-days: 7
+          if-no-files-found: warn
+
+      - name: Run purchase walkthrough on simulator
+        run: |
+          mkdir -p app shots
+          exec > >(tee shots/debug.log) 2>&1
+          set -x
+          tar -xzf "$RUNNER_TEMP/anker-sim.tar.gz" -C app
+          APP=$(find app -maxdepth 3 -name "*.app" -type d | head -1)
+          test -n "$APP"
+          LINE=$(xcrun simctl list devices available | grep -iE 'iPhone .*Pro Max' | head -1)
+          [ -z "$LINE" ] && LINE=$(xcrun simctl list devices available | grep -i 'iPhone' | head -1)
+          UDID=$(echo "$LINE" | grep -oiE '[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}')
+          test -n "$UDID"
+          xcrun simctl boot "$UDID" || true
+          xcrun simctl bootstatus "$UDID" -b
+          xcrun simctl install "$UDID" "$APP"
+          npm install -g appium@latest
+          appium driver install xcuitest
+          (cd e2e && npm install)
+          appium --port 4723 --base-path / > appium.log 2>&1 &
+          for i in $(seq 1 30); do curl -s http://127.0.0.1:4723/status && break; sleep 2; done
+          (cd e2e && UDID="$UDID" BUNDLE_ID="$BUNDLE_ID" SHOTS_DIR=../shots node walkthrough.mjs) || echo "walkthrough exited $?"
+          tail -n 60 appium.log || true
+
+      - name: Upload walkthrough results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: purchase-e2e-results
+          path: |
+            shots/
+            appium.log
+          retention-days: 14
+          if-no-files-found: error
