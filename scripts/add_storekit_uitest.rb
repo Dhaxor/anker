@@ -23,6 +23,10 @@ t.add_dependency(app)
 
 t.build_configurations.each do |c|
   bs = c.build_settings
+  # The gem's new_target leaves PRODUCT_NAME unset for ui_test_bundle targets,
+  # which yields '-Runner.app/PlugIns/.xctest' and a "Multiple commands
+  # produce" collision on the empty name. Set it explicitly.
+  bs['PRODUCT_NAME'] = 'AnkerUITests'
   bs['TEST_TARGET_NAME'] = 'Anker'
   bs['PRODUCT_BUNDLE_IDENTIFIER'] = 'app.anker.einbuergerung.uitests'
   bs['GENERATE_INFOPLIST_FILE'] = 'YES'
