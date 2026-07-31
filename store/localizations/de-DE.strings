@@ -24,3 +24,5 @@
 
 /* What's New (1.0.0) */
 "whatsNew" = "Die erste Version von Anker:\n\n• Alle 460 amtlichen Fragen — 300 allgemeine und 160 aus den Bundesländern\n• Ihre Bestehenswahrscheinlichkeit statt eines Fortschrittsbalkens\n• Prüfungssimulation mit 33 Fragen und 60 Minuten\n• Schwachstellen: die Fragen, die Sie immer wieder falsch beantworten\n• Intelligente Wiederholung, damit Sie zur richtigen Zeit üben\n• Vollständig offline, ohne Konto";
+
+"supportUrl" = "https://dhaxor.github.io/anker/";
